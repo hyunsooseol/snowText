@@ -1,0 +1,80 @@
+---
+name:  profile
+title: Text Profile
+menuGroup: snowText
+menuSubgroup: Text Analysis
+version:  '1.0.0'
+jas: '1.2'
+
+options:
+
+    - name: data
+      type: Data
+
+    - name: vars
+      title: Text Variables
+      type: Variables
+      suggested:
+        - continuous
+      permitted:
+        - numeric
+
+    - name: lengthVar
+      title: Length Variable
+      type: Variable
+      suggested:
+        - continuous
+      permitted:
+        - numeric
+
+
+    - name: group
+      title: Grouping Variable
+      type: Variable
+      suggested:
+        - nominal
+      permitted:
+        - factor
+
+    - name: idVar
+      title: Document ID
+      type: Variable
+      suggested:
+        - nominal
+      permitted:
+        - factor
+
+    - name: lengthBias
+      title: Length Bias Diagnostics
+      type: Bool
+      default: true
+
+
+    - name: multivariate
+      title: Multivariate Profile Test
+      type: Bool
+      default: false
+
+
+    - name: outliers
+      title: Profile Outliers
+      type: Bool
+      default: false
+
+
+    - name: redundancy
+      title: Profile Redundancy
+      type: Bool
+      default: false
+
+    - name: dataQuality
+      title: Profile Data Quality
+      type: Bool
+      default: false
+
+    - name: adjustedRelationships
+      title: Length-Adjusted Relationships
+      type: Bool
+      default: false
+
+...

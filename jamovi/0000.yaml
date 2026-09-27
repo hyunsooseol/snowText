@@ -1,0 +1,33 @@
+---
+title: Text Mining Analysis
+name: snowText
+version: 0.1
+jms: '1.0'
+authors:
+  - Hyunsoo Seol
+maintainer: The package maintainer <yourself@somewhere.net>
+date: '2026-09-27'
+type: R
+description: >-
+  This module provides research-oriented diagnostic statistics for text
+  profiles, including data quality, length bias, length-adjusted relationships,
+  multivariate profile differences, outlier detection, and redundancy checks.
+analyses:
+  - title: Text Profile
+    name: profile
+    ns: snowText
+    ribbon: analyses
+    category: analyses
+    menuGroup: snowText
+    menuTitle: Text Profile
+    menuSubgroup: Text Analysis
+datasets:
+  - name: text_profile
+    path: text_profile.omv
+    description: Text Profile example dataset
+    tags:
+      - Profile diagnostics
+usesNative: true
+minApp: 1.0.8
+
+...

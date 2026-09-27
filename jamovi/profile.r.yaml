@@ -1,0 +1,307 @@
+---
+name:  profile
+title: Text Profile
+refs: snowText
+jrs:   '1.1'
+
+items:
+    - name:  text
+      title: Text Profile
+      type:  Preformatted
+
+    - name: lengthBias
+      title: Length Bias Diagnostics
+      type: Table
+      rows: (vars)
+      visible: (lengthBias)
+      clearWith:
+        - vars
+        - lengthVar
+      columns:
+
+        - name: variable
+          title: Measure
+          type: text
+          content: ($key)
+
+        - name: n
+          title: N
+          type: integer
+
+        - name: correlation
+          title: Length r
+          type: number
+
+        - name: slope
+          title: Slope
+          type: number
+
+        - name: r2
+          title: R²
+          type: number
+
+        - name: p
+          title: p
+          type: number
+          format: zto,pvalue
+
+        - name: effect
+          title: Length Effect
+          type: text
+
+
+
+    # ============================================================
+    # 2. Multivariate Profile Test
+    # ============================================================
+
+    - name: multivariateTest
+      title: Multivariate Profile Test
+      type: Table
+      visible: (multivariate)
+      clearWith:
+        - vars
+        - group
+      columns:
+
+        - name: test
+          title: Test
+          type: text
+
+        - name: value
+          title: Value
+          type: number
+
+        - name: approxF
+          title: Approx. F
+          type: number
+
+        - name: df1
+          title: df1
+          type: number
+
+        - name: df2
+          title: df2
+          type: number
+
+        - name: p
+          title: p
+          type: number
+          format: zto,pvalue
+
+
+
+    # ------------------------------------------------------------
+    # Contribution of individual measures
+    # ------------------------------------------------------------
+
+    - name: profileContribution
+      title: Contribution to Profile Difference
+      type: Table
+      visible: (multivariate)
+      clearWith:
+        - vars
+        - group
+      columns:
+
+        - name: variable
+          title: Measure
+          type: text
+
+        - name: f
+          title: F
+          type: number
+
+        - name: df1
+          title: df1
+          type: number
+
+        - name: df2
+          title: df2
+          type: number
+
+        - name: p
+          title: p
+          type: number
+          format: zto,pvalue
+
+        - name: partialEta2
+          title: Partial η²
+          type: number
+
+
+
+    # ============================================================
+    # 3. Profile Outliers
+    # ============================================================
+
+    - name: outliers
+      title: Profile Outliers
+      type: Table
+      visible: (outliers)
+      clearWith:
+        - vars
+        - idVar
+      columns:
+
+        - name: document
+          title: Document
+          type: text
+
+        - name: row
+          title: Row
+          type: integer
+
+        - name: distance
+          title: Mahalanobis D²
+          type: number
+
+        - name: df
+          title: df
+          type: integer
+
+        - name: p
+          title: p
+          type: number
+          format: zto,pvalue
+
+        - name: flag
+          title: Status
+          type: text
+
+
+
+    # ============================================================
+    # 4. Profile Redundancy
+    # ============================================================
+
+    - name: redundancy
+      title: Profile Redundancy
+      type: Table
+      rows: (vars)
+      visible: (redundancy)
+      clearWith:
+        - vars
+      columns:
+
+        - name: variable
+          title: Measure
+          type: text
+          content: ($key)
+
+        - name: strongest
+          title: Strongest Association
+          type: text
+
+        - name: maxCorrelation
+          title: Max |r|
+          type: number
+
+        - name: vif
+          title: VIF
+          type: number
+
+        - name: status
+          title: Redundancy
+          type: text
+
+    # ============================================================
+    # Profile Data Quality
+    # ============================================================
+
+    - name: dataQuality
+      title: Profile Data Quality
+      type: Table
+      rows: (vars)
+      visible: (dataQuality)
+      clearWith:
+        - vars
+      columns:
+
+        - name: variable
+          title: Measure
+          type: text
+          content: ($key)
+
+        - name: validN
+          title: Valid N
+          type: integer
+
+        - name: missing
+          title: Missing
+          type: integer
+
+        - name: missingPct
+          title: Missing %
+          type: number
+
+        - name: unique
+          title: Unique
+          type: integer
+
+        - name: variance
+          title: Variance
+          type: number
+
+        - name: status
+          title: Status
+          type: text
+
+    - name: dataQualitySummary
+      title: Profile Completeness
+      type: Table
+      visible: (dataQuality)
+      clearWith:
+        - vars
+      columns:
+
+        - name: totalN
+          title: Total Rows
+          type: integer
+
+        - name: completeN
+          title: Complete Rows
+          type: integer
+
+        - name: completePct
+          title: Complete %
+          type: number
+
+    # ============================================================
+    # Length-Adjusted Relationships
+    # ============================================================
+
+    - name: adjustedRelationships
+      title: Length-Adjusted Relationships
+      type: Table
+      visible: (adjustedRelationships)
+      clearWith:
+        - vars
+        - lengthVar
+      columns:
+
+        - name: variable1
+          title: Measure 1
+          type: text
+
+        - name: variable2
+          title: Measure 2
+          type: text
+
+        - name: n
+          title: N
+          type: integer
+
+        - name: correlation
+          title: Partial r
+          type: number
+
+        - name: df
+          title: df
+          type: number
+
+        - name: p
+          title: p
+          type: number
+          format: zto,pvalue
+...

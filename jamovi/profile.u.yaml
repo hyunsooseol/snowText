@@ -1,0 +1,85 @@
+
+---
+name: profile
+title: Text Profile
+jus: '2.0'
+compilerMode: tame
+
+children:
+
+  - type: VariableSupplier
+    stretchFactor: 1
+    children:
+
+      - type: TargetLayoutBox
+        label: Text Variables
+        children:
+          - type: VariablesListBox
+            name: vars
+            isTarget: true
+
+      - type: TargetLayoutBox
+        label: Length Variable
+        children:
+          - type: VariablesListBox
+            name: lengthVar
+            isTarget: true
+            maxItemCount: 1
+
+      - type: TargetLayoutBox
+        label: Grouping Variable
+        children:
+          - type: VariablesListBox
+            name: group
+            isTarget: true
+            maxItemCount: 1
+
+      - type: TargetLayoutBox
+        label: Document ID
+        children:
+          - type: VariablesListBox
+            name: idVar
+            isTarget: true
+            maxItemCount: 1
+
+  - type: CollapseBox
+    label: 'Profile Diagnostics'
+    collapsed: true
+    stretchFactor: 1
+    children:
+      - type: LayoutBox
+        margin: large
+        stretchFactor: 1
+        children:
+          - type: LayoutBox
+            margin: large
+            cell:
+              column: 0
+              row: 0
+            stretchFactor: 1
+            children: 
+              - type: Label
+                label: ''
+                children:
+                  - type: CheckBox
+                    name: lengthBias
+                  - type: CheckBox
+                    name: multivariate
+                  - type: CheckBox
+                    name: outliers
+          - type: LayoutBox
+            margin: large
+            cell:
+              column: 1
+              row: 0
+            stretchFactor: 1
+            children: 
+              - type: Label
+                label: ''
+                children:
+                  - type: CheckBox
+                    name: redundancy
+                  - type: CheckBox
+                    name: dataQuality
+                  - type: CheckBox
+                    name: adjustedRelationships        

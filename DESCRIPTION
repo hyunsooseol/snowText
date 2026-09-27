@@ -1,0 +1,14 @@
+Package: snowText
+Type: Package
+Title: Text Mining Analysis
+Version: 0.1
+Author: Hyunsoo Seol
+Maintainer: Hyunsoo Seol <snow@cau.ac.kr>
+Description: This module provides research-oriented diagnostic statistics for text profiles,
+    including data quality, length bias, length-adjusted relationships,
+    multivariate profile differences, outlier detection, and redundancy checks.
+License: GPL-3
+Encoding: UTF-8
+LazyData: true
+Imports: jmvcore (>= 0.8.5), R6
+RoxygenNote: 7.3.3
