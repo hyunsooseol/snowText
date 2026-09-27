@@ -115,6 +115,7 @@ profileResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
     "profileResults",
     inherit = jmvcore::Group,
     active = list(
+        instructions = function() private$.items[["instructions"]],
         text = function() private$.items[["text"]],
         lengthBias = function() private$.items[["lengthBias"]],
         multivariateTest = function() private$.items[["multivariateTest"]],
@@ -132,6 +133,11 @@ profileResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                 name="",
                 title="Text Profile",
                 refs="snowText")
+            self$add(jmvcore::Html$new(
+                options=options,
+                name="instructions",
+                title="Instructions",
+                visible=TRUE))
             self$add(jmvcore::Preformatted$new(
                 options=options,
                 name="text",
@@ -438,6 +444,7 @@ profileBase <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
 #' @param adjustedRelationships .
 #' @return A results object containing:
 #' \tabular{llllll}{
+#'   \code{results$instructions} \tab \tab \tab \tab \tab a html \cr
 #'   \code{results$text} \tab \tab \tab \tab \tab a preformatted \cr
 #'   \code{results$lengthBias} \tab \tab \tab \tab \tab a table \cr
 #'   \code{results$multivariateTest} \tab \tab \tab \tab \tab a table \cr

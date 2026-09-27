@@ -4,7 +4,29 @@ profileClass <- if (requireNamespace('jmvcore', quietly=TRUE)) R6::R6Class(
   inherit = profileBase,
   
   private = list(
+    .htmlwidget = NULL,
+    # Add instance for HTMLWidget
     
+    .init = function() {
+      private$.htmlwidget <- HTMLWidget$new() # Initialize the HTMLWidget instance
+      
+      if (is.null(self$data) | is.null(self$options$vars)) 
+           {
+        self$results$instructions$setVisible(visible = TRUE)
+        
+      }
+      self$results$instructions$setContent(private$.htmlwidget$generate_accordion(
+        title = "Instructions",
+        content = paste(
+          '<div style="border: 2px solid #e6f4fe; border-radius: 15px; padding: 15px; background-color: #e6f4fe; margin-top: 10px;">',
+          '<div style="text-align:justify;">',
+          '<ul>',
+          '<li>Feature requests and bug reports can be made on my <a href="https://github.com/hyunsooseol/snowText/issues" target="_blank">GitHub</a>.</li>',
+          '</ul></div></div>'
+          
+        )
+      ))
+    },    
     # ================================================================
     # Main analysis
     # ================================================================

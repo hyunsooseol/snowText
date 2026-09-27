@@ -1,7 +1,7 @@
 Package: snowText
 Type: Package
 Title: Text Mining Analysis
-Version: 0.1
+Version: 1.0.0
 Author: Hyunsoo Seol
 Maintainer: Hyunsoo Seol <snow@cau.ac.kr>
 Description: This module provides research-oriented diagnostic statistics for text profiles,
