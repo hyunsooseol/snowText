@@ -1,7 +1,7 @@
 ---
 title: Text Mining Analysis
 name: snowText
-version: 0.0.0
+version: 1.0.0
 jms: '1.0'
 authors:
   - Hyunsoo Seol
@@ -20,12 +20,24 @@ analyses:
     menuGroup: snowText
     menuTitle: Text Profile
     menuSubgroup: Text Analysis
+  - title: Lexical Distribution
+    name: lexical
+    ns: snowText
+    category: analyses
+    menuGroup: snowText
+    menuTitle: Lexical Distribution
+    menuSubgroup: Text Analysis
 datasets:
   - name: text_profile
     path: text_profile.omv
     description: Text Profile example dataset
     tags:
       - Profile diagnostics
+  - name: lexical
+    path: lexical.omv
+    description: Lexical distribution
+    tags:
+      - Lexical distribution
 usesNative: true
 minApp: 1.0.8
 

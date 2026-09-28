@@ -1,0 +1,98 @@
+
+name: lexical
+title: Lexical Distribution
+jus: '2.0'
+compilerMode: tame
+
+children:
+
+  - type: VariableSupplier
+    stretchFactor: 1
+    children:
+
+      - type: TargetLayoutBox
+        label: Words
+        children:
+          - type: VariablesListBox
+            name: words
+            isTarget: true
+            maxItemCount: 1
+
+      - type: TargetLayoutBox
+        label: Frequency
+        children:
+          - type: VariablesListBox
+            name: freq
+            isTarget: true
+            maxItemCount: 1
+
+
+  - type: CollapseBox
+    label: 'Distribution Statistics'
+    collapsed: false
+    stretchFactor: 1
+    children:
+
+      - type: LayoutBox
+        margin: large
+        stretchFactor: 1
+        children:
+
+          - type: LayoutBox
+            margin: large
+            cell:
+              column: 0
+              row: 0
+            stretchFactor: 1
+            children:
+
+              - type: Label
+                label: ''
+                children:
+
+                  - type: CheckBox
+                    name: vocabularyStructure
+
+                  - type: CheckBox
+                    name: concentration
+
+                  - type: CheckBox
+                    name: coverage
+
+                  - type: CheckBox
+                    name: zipf
+
+
+  - type: CollapseBox
+    label: 'Plots'
+    collapsed: true
+    stretchFactor: 1
+    children:
+
+      - type: LayoutBox
+        margin: large
+        stretchFactor: 1
+        children:
+
+          - type: LayoutBox
+            margin: large
+            cell:
+              column: 0
+              row: 0
+            stretchFactor: 1
+            children:
+
+              - type: Label
+                label: ''
+                children:
+
+                  - type: CheckBox
+                    name: rankFrequencyPlot
+
+                  - type: CheckBox
+                    name: lorenzPlot
+
+                  - type: CheckBox
+                    name: frequencySpectrumPlot
+
+...

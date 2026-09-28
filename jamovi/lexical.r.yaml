@@ -1,0 +1,196 @@
+
+---
+name: lexical
+title: Lexical Distribution
+refs: snowText
+jrs: '1.1'
+
+items:
+
+    - name: instructions
+      title: Instructions
+      type: Html
+      visible: true
+
+
+    # ============================================================
+    # 1. Vocabulary Structure
+    # ============================================================
+
+    - name: vocabularyStructure
+      title: Vocabulary Structure
+      type: Table
+      visible: (vocabularyStructure)
+      clearWith:
+        - words
+        - freq
+      columns:
+
+        - name: vocabularySize
+          title: Vocabulary Size
+          type: integer
+
+        - name: totalTokens
+          title: Total Tokens
+          type: integer
+
+        - name: hapaxCount
+          title: Hapax
+          type: integer
+
+        - name: hapaxRatio
+          title: Hapax Ratio
+          type: number
+
+        - name: disCount
+          title: Dis Legomena
+          type: integer
+
+        - name: disRatio
+          title: Dis Ratio
+          type: number
+
+
+    # ============================================================
+    # 2. Distribution Concentration
+    # ============================================================
+
+    - name: concentration
+      title: Distribution Concentration
+      type: Table
+      visible: (concentration)
+      clearWith:
+        - words
+        - freq
+      columns:
+
+        - name: shannon
+          title: Shannon H
+          type: number
+
+        - name: normalizedEntropy
+          title: Normalized Entropy
+          type: number
+
+        - name: gini
+          title: Gini
+          type: number
+
+        - name: simpson
+          title: Simpson Concentration
+          type: number
+
+
+    # ============================================================
+    # 3. Coverage Analysis
+    # ============================================================
+
+    - name: coverage
+      title: Coverage Analysis
+      type: Table
+      visible: (coverage)
+      clearWith:
+        - words
+        - freq
+      columns:
+
+        - name: top10
+          title: Top 10 Coverage (%)
+          type: number
+
+        - name: top20
+          title: Top 20 Coverage (%)
+          type: number
+
+        - name: coverage50
+          title: Words for 50%
+          type: integer
+
+        - name: coverage80
+          title: Words for 80%
+          type: integer
+
+        - name: coverage90
+          title: Words for 90%
+          type: integer
+
+
+    # ============================================================
+    # 4. Zipf Diagnostics
+    # ============================================================
+
+    - name: zipf
+      title: Zipf Diagnostics
+      type: Table
+      visible: (zipf)
+      clearWith:
+        - words
+        - freq
+      columns:
+
+        - name: n
+          title: Words
+          type: integer
+
+        - name: slope
+          title: Slope
+          type: number
+
+        - name: intercept
+          title: Intercept
+          type: number
+
+        - name: r2
+          title: R²
+          type: number
+
+    # ============================================================
+    # 5. Rank-Frequency Plot
+    # ============================================================
+
+    - name: rankFrequencyPlot
+      title: Rank-Frequency Plot
+      type: Image
+      width: 650
+      height: 450
+      renderFun: .plotRankFrequency
+      visible: (rankFrequencyPlot)
+      clearWith:
+        - words
+        - freq
+
+
+    # ============================================================
+    # 6. Lorenz Curve
+    # ============================================================
+
+    - name: lorenzPlot
+      title: Lorenz Curve
+      type: Image
+      width: 650
+      height: 450
+      renderFun: .plotLorenz
+      visible: (lorenzPlot)
+      clearWith:
+        - words
+        - freq
+
+
+    # ============================================================
+    # 7. Frequency Spectrum
+    # ============================================================
+
+    - name: frequencySpectrumPlot
+      title: Frequency Spectrum
+      type: Image
+      width: 650
+      height: 450
+      renderFun: .plotFrequencySpectrum
+      visible: (frequencySpectrumPlot)
+      clearWith:
+        - words
+        - freq
+
+...
+
+
