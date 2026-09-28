@@ -15,7 +15,10 @@ profile(
   outliers = FALSE,
   redundancy = FALSE,
   dataQuality = FALSE,
-  adjustedRelationships = FALSE
+  adjustedRelationships = FALSE,
+  profilePlot = FALSE,
+  diagnosticMap = FALSE,
+  angle = 0
 )
 }
 \arguments{
@@ -40,6 +43,12 @@ profile(
 \item{dataQuality}{.}
 
 \item{adjustedRelationships}{.}
+
+\item{profilePlot}{.}
+
+\item{diagnosticMap}{.}
+
+\item{angle}{.}
 }
 \value{
 A results object containing:
@@ -54,6 +63,8 @@ A results object containing:
   \code{results$dataQuality} \tab \tab \tab \tab \tab a table \cr
   \code{results$dataQualitySummary} \tab \tab \tab \tab \tab a table \cr
   \code{results$adjustedRelationships} \tab \tab \tab \tab \tab a table \cr
+  \code{results$profilePlot} \tab \tab \tab \tab \tab an image \cr
+  \code{results$diagnosticMap} \tab \tab \tab \tab \tab an image \cr
 }
 
 Tables can be converted to data frames with \code{asDF} or \code{\link{as.data.frame}}. For example:

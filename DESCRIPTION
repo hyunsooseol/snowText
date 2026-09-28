@@ -12,3 +12,4 @@ Encoding: UTF-8
 LazyData: true
 Imports: jmvcore (>= 0.8.5), R6
 Config/roxygen2/version: 8.0.0
+RoxygenNote: 7.3.3

@@ -15,7 +15,10 @@ profileOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
             outliers = FALSE,
             redundancy = FALSE,
             dataQuality = FALSE,
-            adjustedRelationships = FALSE, ...) {
+            adjustedRelationships = FALSE,
+            profilePlot = FALSE,
+            diagnosticMap = FALSE,
+            angle = 0, ...) {
 
             super$initialize(
                 package="snowText",
@@ -75,6 +78,20 @@ profileOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                 "adjustedRelationships",
                 adjustedRelationships,
                 default=FALSE)
+            private$..profilePlot <- jmvcore::OptionBool$new(
+                "profilePlot",
+                profilePlot,
+                default=FALSE)
+            private$..diagnosticMap <- jmvcore::OptionBool$new(
+                "diagnosticMap",
+                diagnosticMap,
+                default=FALSE)
+            private$..angle <- jmvcore::OptionNumber$new(
+                "angle",
+                angle,
+                min=0,
+                max=90,
+                default=0)
 
             self$.addOption(private$..vars)
             self$.addOption(private$..lengthVar)
@@ -86,6 +103,9 @@ profileOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
             self$.addOption(private$..redundancy)
             self$.addOption(private$..dataQuality)
             self$.addOption(private$..adjustedRelationships)
+            self$.addOption(private$..profilePlot)
+            self$.addOption(private$..diagnosticMap)
+            self$.addOption(private$..angle)
         }),
     active = list(
         vars = function() private$..vars$value,
@@ -97,7 +117,10 @@ profileOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
         outliers = function() private$..outliers$value,
         redundancy = function() private$..redundancy$value,
         dataQuality = function() private$..dataQuality$value,
-        adjustedRelationships = function() private$..adjustedRelationships$value),
+        adjustedRelationships = function() private$..adjustedRelationships$value,
+        profilePlot = function() private$..profilePlot$value,
+        diagnosticMap = function() private$..diagnosticMap$value,
+        angle = function() private$..angle$value),
     private = list(
         ..vars = NA,
         ..lengthVar = NA,
@@ -108,7 +131,10 @@ profileOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
         ..outliers = NA,
         ..redundancy = NA,
         ..dataQuality = NA,
-        ..adjustedRelationships = NA)
+        ..adjustedRelationships = NA,
+        ..profilePlot = NA,
+        ..diagnosticMap = NA,
+        ..angle = NA)
 )
 
 profileResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
@@ -124,7 +150,9 @@ profileResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
         redundancy = function() private$.items[["redundancy"]],
         dataQuality = function() private$.items[["dataQuality"]],
         dataQualitySummary = function() private$.items[["dataQualitySummary"]],
-        adjustedRelationships = function() private$.items[["adjustedRelationships"]]),
+        adjustedRelationships = function() private$.items[["adjustedRelationships"]],
+        profilePlot = function() private$.items[["profilePlot"]],
+        diagnosticMap = function() private$.items[["diagnosticMap"]]),
     private = list(),
     public=list(
         initialize=function(options) {
@@ -405,7 +433,31 @@ profileResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                         `name`="p", 
                         `title`="p", 
                         `type`="number", 
-                        `format`="zto,pvalue"))))}))
+                        `format`="zto,pvalue"))))
+            self$add(jmvcore::Image$new(
+                options=options,
+                name="profilePlot",
+                title="Text Profile Plot",
+                width=650,
+                height=450,
+                renderFun=".plotProfile",
+                visible="(profilePlot)",
+                clearWith=list(
+                    "vars",
+                    "group",
+                    "angle")))
+            self$add(jmvcore::Image$new(
+                options=options,
+                name="diagnosticMap",
+                title="Profile Diagnostic Map",
+                width=650,
+                height=450,
+                renderFun=".plotDiagnosticMap",
+                visible="(diagnosticMap)",
+                clearWith=list(
+                    "vars",
+                    "lengthVar",
+                    "group")))}))
 
 profileBase <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
     "profileBase",
@@ -442,6 +494,9 @@ profileBase <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
 #' @param redundancy .
 #' @param dataQuality .
 #' @param adjustedRelationships .
+#' @param profilePlot .
+#' @param diagnosticMap .
+#' @param angle .
 #' @return A results object containing:
 #' \tabular{llllll}{
 #'   \code{results$instructions} \tab \tab \tab \tab \tab a html \cr
@@ -454,6 +509,8 @@ profileBase <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
 #'   \code{results$dataQuality} \tab \tab \tab \tab \tab a table \cr
 #'   \code{results$dataQualitySummary} \tab \tab \tab \tab \tab a table \cr
 #'   \code{results$adjustedRelationships} \tab \tab \tab \tab \tab a table \cr
+#'   \code{results$profilePlot} \tab \tab \tab \tab \tab an image \cr
+#'   \code{results$diagnosticMap} \tab \tab \tab \tab \tab an image \cr
 #' }
 #'
 #' Tables can be converted to data frames with \code{asDF} or \code{\link{as.data.frame}}. For example:
@@ -474,7 +531,10 @@ profile <- function(
     outliers = FALSE,
     redundancy = FALSE,
     dataQuality = FALSE,
-    adjustedRelationships = FALSE) {
+    adjustedRelationships = FALSE,
+    profilePlot = FALSE,
+    diagnosticMap = FALSE,
+    angle = 0) {
 
     if ( ! requireNamespace("jmvcore", quietly=TRUE))
         stop("profile requires jmvcore to be installed (restart may be required)")
@@ -504,7 +564,10 @@ profile <- function(
         outliers = outliers,
         redundancy = redundancy,
         dataQuality = dataQuality,
-        adjustedRelationships = adjustedRelationships)
+        adjustedRelationships = adjustedRelationships,
+        profilePlot = profilePlot,
+        diagnosticMap = diagnosticMap,
+        angle = angle)
 
     analysis <- profileClass$new(
         options = options,

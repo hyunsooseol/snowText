@@ -309,4 +309,40 @@ items:
           title: p
           type: number
           format: zto,pvalue
+
+    # ============================================================
+    # Text Profile Plot
+    # ============================================================
+
+    - name: profilePlot
+      title: Text Profile Plot
+      type: Image
+      width: 650
+      height: 450
+      renderFun: .plotProfile
+      visible: (profilePlot)
+      clearWith:
+        - vars
+        - group
+        - angle
+
+
+    # ============================================================
+    # Profile Diagnostic Map
+    # ============================================================
+
+    - name: diagnosticMap
+      title: Profile Diagnostic Map
+      type: Image
+      width: 650
+      height: 450
+      renderFun: .plotDiagnosticMap
+      visible: (diagnosticMap)
+      clearWith:
+        - vars
+        - lengthVar
+        - group
+
+
+
 ...

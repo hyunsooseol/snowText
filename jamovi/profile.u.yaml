@@ -82,4 +82,42 @@ children:
                   - type: CheckBox
                     name: dataQuality
                   - type: CheckBox
-                    name: adjustedRelationships        
+                    name: adjustedRelationships  
+
+  - type: CollapseBox
+    label: 'Plots'
+    collapsed: true
+    stretchFactor: 1
+    children:
+
+      - type: LayoutBox
+        margin: large
+        stretchFactor: 1
+        children:
+
+          - type: LayoutBox
+            margin: large
+            cell:
+              column: 0
+              row: 0
+            stretchFactor: 1
+            children:
+
+              - type: Label
+                label: ''
+                children:
+
+                  - type: CheckBox
+                    name: profilePlot
+                    children:
+                      - type: TextBox
+                        name: angle
+                        format: number
+                        enable: (profilePlot)
+                        suggestedValues:
+                          - value: 0
+                          - value: 45
+                          - value: 90
+
+                  - type: CheckBox
+                    name: diagnosticMap                    

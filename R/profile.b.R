@@ -1251,6 +1251,559 @@ profileClass <- if (requireNamespace('jmvcore', quietly=TRUE)) R6::R6Class(
           )
         }
       }
+      
+      
+      # ============================================================
+      # 7. PLOT STATES
+      # ============================================================
+      
+      # ------------------------------------------------------------
+      # Text Profile Plot
+      # ------------------------------------------------------------
+      
+      if (isTRUE(self$options$profilePlot)) {
+        
+        groupVar <- self$options$group
+        
+        state <- list(
+          valid = FALSE,
+          message = 'Select a Grouping Variable to display group text profiles.'
+        )
+        
+        if (! is.null(groupVar) &&
+            length(groupVar) == 1 &&
+            groupVar != '' &&
+            groupVar %in% names(data) &&
+            length(vars) >= 2) {
+          
+          X <- private$.numericMatrix(data, vars)
+          g <- data[[groupVar]]
+          
+          if (! is.factor(g))
+            g <- factor(g)
+          
+          complete <- stats::complete.cases(X) & !is.na(g)
+          Xcc <- X[complete, , drop = FALSE]
+          gcc <- droplevels(g[complete])
+          
+          if (nrow(Xcc) >= 3 && nlevels(gcc) >= 2) {
+            
+            sdValues <- apply(Xcc, 2, stats::sd)
+            keep <- is.finite(sdValues) & sdValues > 0
+            
+            Xuse <- Xcc[, keep, drop = FALSE]
+            plotVars <- colnames(Xuse)
+            
+            if (ncol(Xuse) >= 2) {
+              
+              means <- colMeans(Xuse)
+              sds <- apply(Xuse, 2, stats::sd)
+              
+              Z <- sweep(Xuse, 2, means, FUN = '-')
+              Z <- sweep(Z, 2, sds, FUN = '/')
+              
+              groupLevels <- levels(gcc)
+              
+              profileMeans <- lapply(
+                groupLevels,
+                function(level) {
+                  rows <- gcc == level
+                  colMeans(Z[rows, , drop = FALSE], na.rm = TRUE)
+                }
+              )
+              
+              profileMeans <- do.call(rbind, profileMeans)
+              rownames(profileMeans) <- groupLevels
+              
+              state <- list(
+                valid = TRUE,
+                variables = plotVars,
+                groups = groupLevels,
+                means = profileMeans
+              )
+              
+            } else {
+              
+              state$message <- paste(
+                'At least two non-constant Text Variables are required',
+                'for the Text Profile Plot.'
+              )
+            }
+            
+          } else {
+            
+            state$message <- paste(
+              'At least two observed groups and sufficient complete cases',
+              'are required for the Text Profile Plot.'
+            )
+          }
+          
+        } else if (length(vars) < 2) {
+          
+          state$message <- paste(
+            'At least two Text Variables are required',
+            'for the Text Profile Plot.'
+          )
+        }
+        
+        self$results$profilePlot$setState(state)
+      }
+      
+      
+      # ------------------------------------------------------------
+      # Profile Diagnostic Map
+      # ------------------------------------------------------------
+      
+      if (isTRUE(self$options$diagnosticMap)) {
+        
+        diagnostics <- c('Length Bias', 'Redundancy', 'Data Quality')
+        
+        statusMatrix <- matrix(
+          'Not available',
+          nrow = length(vars),
+          ncol = length(diagnostics),
+          dimnames = list(vars, diagnostics)
+        )
+        
+        severityMatrix <- matrix(
+          NA_real_,
+          nrow = length(vars),
+          ncol = length(diagnostics),
+          dimnames = list(vars, diagnostics)
+        )
+        
+        # Length-bias classification
+        lengthVar <- self$options$lengthVar
+        
+        if (! is.null(lengthVar) &&
+            length(lengthVar) == 1 &&
+            lengthVar != '' &&
+            lengthVar %in% names(data)) {
+          
+          lengthX <- private$.numeric(data[[lengthVar]])
+          
+          for (i in seq_along(vars)) {
+            var <- vars[i]
+            y <- private$.numeric(data[[var]])
+            
+            if (identical(var, lengthVar)) {
+              statusMatrix[i, 'Length Bias'] <- 'Length variable'
+              next
+            }
+            
+            valid <- is.finite(lengthX) & is.finite(y)
+            x <- lengthX[valid]
+            yy <- y[valid]
+            
+            if (length(yy) >= 3 &&
+                length(unique(x)) > 1 &&
+                length(unique(yy)) > 1) {
+              
+              fit <- tryCatch(stats::lm(yy ~ x), error = function(e) NULL)
+              
+              if (! is.null(fit)) {
+                r2 <- summary(fit)$r.squared
+                effect <- private$.lengthEffect(r2)
+                statusMatrix[i, 'Length Bias'] <- effect
+                severityMatrix[i, 'Length Bias'] <- switch(
+                  effect,
+                  'Negligible' = 0,
+                  'Small' = 1,
+                  'Moderate' = 2,
+                  'Large' = 3,
+                  NA_real_
+                )
+              }
+            }
+          }
+        }
+        
+        # Redundancy classification
+        if (length(vars) >= 2) {
+          
+          X <- private$.numericMatrix(data, vars)
+          complete <- stats::complete.cases(X)
+          Xcomplete <- X[complete, , drop = FALSE]
+          
+          for (i in seq_along(vars)) {
+            otherIndex <- setdiff(seq_along(vars), i)
+            vif <- NA_real_
+            
+            if (nrow(Xcomplete) >= 3) {
+              y <- Xcomplete[, i]
+              predictors <- Xcomplete[, otherIndex, drop = FALSE]
+              
+              if (length(unique(y)) > 1 && ncol(predictors) >= 1) {
+                predictorOK <- apply(
+                  predictors,
+                  2,
+                  function(z) is.finite(stats::var(z)) && stats::var(z) > 0
+                )
+                
+                predictors <- predictors[, predictorOK, drop = FALSE]
+                
+                if (ncol(predictors) >= 1 &&
+                    nrow(predictors) > ncol(predictors) + 1) {
+                  
+                  vifData <- data.frame(
+                    y = y,
+                    predictors,
+                    check.names = FALSE
+                  )
+                  
+                  fit <- tryCatch(
+                    stats::lm(y ~ ., data = vifData),
+                    error = function(e) NULL
+                  )
+                  
+                  if (! is.null(fit)) {
+                    r2 <- summary(fit)$r.squared
+                    
+                    if (is.finite(r2)) {
+                      if (r2 >= 1 - sqrt(.Machine$double.eps))
+                        vif <- Inf
+                      else
+                        vif <- 1 / (1 - r2)
+                    }
+                  }
+                }
+              }
+            }
+            
+            if (is.infinite(vif)) {
+              statusMatrix[i, 'Redundancy'] <- 'High'
+              severityMatrix[i, 'Redundancy'] <- 3
+            } else if (is.finite(vif)) {
+              if (vif >= 10) {
+                statusMatrix[i, 'Redundancy'] <- 'High'
+                severityMatrix[i, 'Redundancy'] <- 3
+              } else if (vif >= 5) {
+                statusMatrix[i, 'Redundancy'] <- 'Moderate'
+                severityMatrix[i, 'Redundancy'] <- 2
+              } else {
+                statusMatrix[i, 'Redundancy'] <- 'Low'
+                severityMatrix[i, 'Redundancy'] <- 0
+              }
+            }
+          }
+        }
+        
+        # Data-quality classification
+        for (i in seq_along(vars)) {
+          var <- vars[i]
+          x <- private$.numeric(data[[var]])
+          
+          valid <- is.finite(x)
+          validN <- sum(valid)
+          missing <- length(x) - validN
+          
+          missingPct <- if (length(x) > 0)
+            missing / length(x) * 100
+          else
+            NA_real_
+          
+          variance <- NA_real_
+          if (validN >= 2)
+            variance <- stats::var(x[valid])
+          
+          status <- 'OK'
+          severity <- 0
+          
+          if (validN < 3) {
+            status <- 'Insufficient'
+            severity <- 3
+          } else if (is.finite(variance) && variance <= 0) {
+            status <- 'Constant'
+            severity <- 3
+          } else if (is.finite(missingPct) && missingPct >= 20) {
+            status <- 'High missingness'
+            severity <- 2
+          }
+          
+          statusMatrix[i, 'Data Quality'] <- status
+          severityMatrix[i, 'Data Quality'] <- severity
+        }
+        
+        self$results$diagnosticMap$setState(
+          list(
+            variables = vars,
+            diagnostics = diagnostics,
+            status = statusMatrix,
+            severity = severityMatrix
+          )
+        )
+      }
+      
+    },
+    
+    
+    
+    # ================================================================
+    # Text Profile Plot
+    # ================================================================
+    .plotProfile = function(
+    image,
+    ggtheme,
+    theme,
+    ...
+    ) {
+      
+      state <- image$state
+      
+      if (is.null(state))
+        return(FALSE)
+      
+      if (isFALSE(state$valid)) {
+        
+        message <- if (!is.null(state$message))
+          as.character(state$message)
+        else
+          'The Text Profile Plot is not available for the current selections.'
+        
+        plot <- ggplot2::ggplot() +
+          ggplot2::annotate(
+            'text',
+            x = 0,
+            y = 0,
+            label = message,
+            size = 4
+          ) +
+          ggplot2::xlim(-1, 1) +
+          ggplot2::ylim(-1, 1) +
+          ggplot2::labs(x = NULL, y = NULL) +
+          ggtheme +
+          ggplot2::theme(
+            axis.text = ggplot2::element_blank(),
+            axis.ticks = ggplot2::element_blank(),
+            panel.grid = ggplot2::element_blank()
+          )
+        
+        print(plot)
+        return(TRUE)
+      }
+      
+      if (is.null(state$variables) ||
+          is.null(state$groups) ||
+          is.null(state$means))
+        return(FALSE)
+      
+      variables <- as.character(state$variables)
+      groups <- as.character(state$groups)
+      means <- as.matrix(state$means)
+      
+      if (length(variables) < 2 ||
+          length(groups) < 2 ||
+          nrow(means) != length(groups) ||
+          ncol(means) != length(variables))
+        return(FALSE)
+      
+      plotData <- data.frame(
+        Variable = factor(
+          rep(variables, times = length(groups)),
+          levels = variables
+        ),
+        Group = factor(
+          rep(groups, each = length(variables)),
+          levels = groups
+        ),
+        MeanZ = as.vector(t(means)),
+        stringsAsFactors = FALSE
+      )
+      
+      plotData <- plotData[
+        is.finite(plotData$MeanZ),
+        ,
+        drop = FALSE
+      ]
+      
+      if (nrow(plotData) == 0)
+        return(FALSE)
+      
+      palette <- grDevices::hcl.colors(
+        max(3, length(groups)),
+        palette = 'Dark 3'
+      )[seq_along(groups)]
+      
+      plot <- ggplot2::ggplot(
+        plotData,
+        ggplot2::aes(
+          x = Variable,
+          y = MeanZ,
+          group = Group,
+          colour = Group
+        )
+      ) +
+        ggplot2::geom_hline(
+          yintercept = 0,
+          linetype = 'dashed',
+          linewidth = 0.5,
+          colour = '#777777'
+        ) +
+        ggplot2::geom_line(linewidth = 1) +
+        ggplot2::geom_point(size = 2.8) +
+        ggplot2::scale_colour_manual(values = palette) +
+        ggplot2::labs(
+          x = 'Text Measure',
+          y = 'Mean Standardized Score (z)',
+          colour = 'Group'
+        ) +
+        ggtheme +
+        ggplot2::theme(
+          legend.position = 'right'
+        )
+      
+      # plot <- plot +
+      #   ggplot2::theme(
+      #     axis.text.x = ggplot2::element_text(
+      #       angle = self$options$angle,
+      #       hjust = if (self$options$angle == 0) 0.5 else 1
+      #     )
+      #   )
+      if (self$options$angle > 0) {
+        plot <- plot +
+          ggplot2::theme(
+            axis.text.x = ggplot2::element_text(
+              angle = self$options$angle,
+              hjust = 1
+            )
+          )
+      }
+      
+      print(plot)
+      TRUE
+    },
+    
+    
+    # ================================================================
+    # Profile Diagnostic Map
+    # ================================================================
+    
+    .plotDiagnosticMap = function(
+    image,
+    ggtheme,
+    theme,
+    ...
+    ) {
+      
+      state <- image$state
+      
+      if (is.null(state))
+        return(FALSE)
+      
+      if (is.null(state$variables) ||
+          is.null(state$diagnostics) ||
+          is.null(state$status) ||
+          is.null(state$severity))
+        return(FALSE)
+      
+      variables <- as.character(state$variables)
+      diagnostics <- as.character(state$diagnostics)
+      status <- as.matrix(state$status)
+      severity <- as.matrix(state$severity)
+      
+      if (length(variables) == 0 ||
+          nrow(status) != length(variables) ||
+          ncol(status) != length(diagnostics) ||
+          !all(dim(status) == dim(severity)))
+        return(FALSE)
+      
+      plotData <- expand.grid(
+        Variable = variables,
+        Diagnostic = diagnostics,
+        stringsAsFactors = FALSE
+      )
+      
+      plotData$Variable <- factor(
+        plotData$Variable,
+        levels = rev(variables)
+      )
+      
+      plotData$Diagnostic <- factor(
+        plotData$Diagnostic,
+        levels = diagnostics
+      )
+      
+      plotData$Status <- as.vector(status)
+      plotData$Severity <- as.vector(severity)
+      
+      plotData$Level <- ifelse(
+        is.na(plotData$Severity),
+        'Not available',
+        ifelse(
+          plotData$Severity >= 3,
+          'High concern',
+          ifelse(
+            plotData$Severity >= 2,
+            'Moderate concern',
+            ifelse(
+              plotData$Severity >= 1,
+              'Low concern',
+              'No/low concern'
+            )
+          )
+        )
+      )
+      
+      plotData$Level <- factor(
+        plotData$Level,
+        levels = c(
+          'No/low concern',
+          'Low concern',
+          'Moderate concern',
+          'High concern',
+          'Not available'
+        )
+      )
+      
+      fillValues <- c(
+        'No/low concern' = '#2E7D32',
+        'Low concern' = '#F9A825',
+        'Moderate concern' = '#EF6C00',
+        'High concern' = '#C62828',
+        'Not available' = '#8A8A8A'
+      )
+      
+      textColour <- ifelse(
+        plotData$Level == 'Low concern',
+        '#222222',
+        '#FFFFFF'
+      )
+      
+      plot <- ggplot2::ggplot(
+        plotData,
+        ggplot2::aes(
+          x = Diagnostic,
+          y = Variable,
+          fill = Level
+        )
+      ) +
+        ggplot2::geom_tile(
+          colour = '#FFFFFF',
+          linewidth = 0.8
+        ) +
+        ggplot2::geom_text(
+          ggplot2::aes(label = Status),
+          colour = textColour,
+          size = 3.4
+        ) +
+        ggplot2::scale_fill_manual(
+          values = fillValues,
+          drop = FALSE
+        ) +
+        ggplot2::labs(
+          x = NULL,
+          y = NULL,
+          fill = 'Diagnostic level'
+        ) +
+        ggtheme +
+        ggplot2::theme(
+          panel.grid = ggplot2::element_blank(),
+          axis.ticks = ggplot2::element_blank(),
+          legend.position = 'right'
+        )
+      
+      print(plot)
+      TRUE
     },
     
     

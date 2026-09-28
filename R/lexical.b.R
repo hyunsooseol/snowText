@@ -770,8 +770,9 @@ lexicalClass <- if (requireNamespace('jmvcore', quietly = TRUE)) R6::R6Class(
         )
       ) +
         ggplot2::geom_point(
-          size = 2,
-          alpha = 0.75
+          size = 2.2,
+          alpha = 0.75,
+          colour = "#2F80ED"
         ) +
         ggplot2::scale_x_log10() +
         ggplot2::scale_y_log10() +
@@ -809,7 +810,8 @@ lexicalClass <- if (requireNamespace('jmvcore', quietly = TRUE)) R6::R6Class(
                 y = Frequency
               ),
               inherit.aes = FALSE,
-              linewidth = 0.8
+              linewidth = 0.9,
+              colour = "#EB5757"
             )
         }
       }
@@ -856,11 +858,11 @@ lexicalClass <- if (requireNamespace('jmvcore', quietly = TRUE)) R6::R6Class(
       )
       
       
-      
       gini <- if (!is.null(state$gini))
         as.numeric(state$gini)
       else
         NA_real_
+      
       
       valid <- is.finite(cumulativeWords) &
         is.finite(cumulativeFrequency)
@@ -890,10 +892,17 @@ lexicalClass <- if (requireNamespace('jmvcore', quietly = TRUE)) R6::R6Class(
         ggplot2::geom_abline(
           intercept = 0,
           slope = 1,
-          linetype = "dashed"
+          linetype = "dashed",
+          linewidth = 0.7,
+          colour = "#7F8C8D"
+        ) +
+        ggplot2::geom_area(
+          fill = "#56CCF2",
+          alpha = 0.18
         ) +
         ggplot2::geom_line(
-          linewidth = 1
+          linewidth = 1.1,
+          colour = "#2F80ED"
         ) +
         ggplot2::labs(
           x = "Cumulative Proportion of Words",
@@ -917,6 +926,10 @@ lexicalClass <- if (requireNamespace('jmvcore', quietly = TRUE)) R6::R6Class(
       TRUE
     },
     
+    
+    # ============================================================
+    # Frequency Spectrum
+    # ============================================================
     
     # ============================================================
     # Frequency Spectrum
@@ -978,20 +991,25 @@ lexicalClass <- if (requireNamespace('jmvcore', quietly = TRUE)) R6::R6Class(
           y = WordTypes
         )
       ) +
-        ggplot2::geom_col() +
+        ggplot2::geom_col(
+          width = 0.8,
+          fill = "#2F80ED",
+          colour = "#1F5FAE",
+          linewidth = 0.25,
+          alpha = 0.85
+        ) +
         ggplot2::labs(
           x = "Frequency",
           y = "Number of Word Types"
-        )
-      
-      
-      plot <- plot + ggtheme
+        ) +
+        ggtheme
       
       
       print(plot)
       
       TRUE
     }
+    
     
   )
 )

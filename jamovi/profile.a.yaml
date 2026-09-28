@@ -77,4 +77,24 @@ options:
       type: Bool
       default: false
 
+    # ============================================================
+    # Plots
+    # ============================================================
+
+    - name: profilePlot
+      title: Text Profile Plot
+      type: Bool
+      default: false
+
+    - name: diagnosticMap
+      title: Profile Diagnostic Map
+      type: Bool
+      default: false
+
+    - name: angle
+      title: Angle of x-axis labels
+      type: Number
+      min: 0
+      max: 90
+      default: 0
 ...
