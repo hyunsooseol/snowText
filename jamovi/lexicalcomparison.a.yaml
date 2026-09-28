@@ -1,0 +1,85 @@
+---
+name: lexicalComparison
+title: Lexical Distribution Comparison
+menuGroup: snowText
+menuSubgroup: Text Analysis
+version: '1.0.0'
+jas: '1.2'
+
+options:
+
+    - name: data
+      type: Data
+
+    - name: words
+      title: Words
+      type: Variable
+      suggested:
+        - nominal
+      permitted:
+        - factor
+
+    - name: freq
+      title: Frequency
+      type: Variable
+      suggested:
+        - continuous
+      permitted:
+        - numeric
+
+    - name: group
+      title: Group
+      type: Variable
+      suggested:
+        - nominal
+      permitted:
+        - factor
+
+
+    # ============================================================
+    # Distribution Comparison
+    # ============================================================
+
+    - name: distributionDifference
+      title: Distribution Difference
+      type: Bool
+      default: true
+
+    - name: vocabularyOverlap
+      title: Vocabulary Overlap
+      type: Bool
+      default: false
+
+    - name: concentrationDifference
+      title: Concentration Difference
+      type: Bool
+      default: false
+
+    - name: contribution
+      title: Contribution to Difference
+      type: Bool
+      default: false
+
+
+    # ============================================================
+    # Plots
+    # ============================================================
+
+    - name: distancePlot
+      title: Distribution Distance Plot
+      type: Bool
+      default: false
+
+    - name: contributionPlot
+      title: Contribution Plot
+      type: Bool
+      default: false
+
+    - name: angle
+      title: Angle of x-axis labels
+      type: Number
+      min: 0
+      max: 90
+      default: 0
+
+...

@@ -1,0 +1,110 @@
+
+name: lexicalComparison
+title: Lexical Distribution Comparison
+jus: '2.0'
+compilerMode: tame
+
+children:
+
+  - type: VariableSupplier
+    stretchFactor: 1
+    children:
+
+      - type: TargetLayoutBox
+        label: Words
+        children:
+          - type: VariablesListBox
+            name: words
+            isTarget: true
+            maxItemCount: 1
+
+      - type: TargetLayoutBox
+        label: Frequency
+        children:
+          - type: VariablesListBox
+            name: freq
+            isTarget: true
+            maxItemCount: 1
+
+      - type: TargetLayoutBox
+        label: Group
+        children:
+          - type: VariablesListBox
+            name: group
+            isTarget: true
+            maxItemCount: 1
+
+
+  - type: CollapseBox
+    label: 'Distribution Comparison'
+    collapsed: false
+    stretchFactor: 1
+    children:
+
+      - type: LayoutBox
+        margin: large
+        stretchFactor: 1
+        children:
+
+          - type: LayoutBox
+            margin: large
+            cell:
+              column: 0
+              row: 0
+            stretchFactor: 1
+            children:
+
+              - type: Label
+                label: ''
+                children:
+
+                  - type: CheckBox
+                    name: distributionDifference
+
+                  - type: CheckBox
+                    name: vocabularyOverlap
+
+                  - type: CheckBox
+                    name: concentrationDifference
+
+                  - type: CheckBox
+                    name: contribution
+
+
+  - type: CollapseBox
+    label: 'Plots'
+    collapsed: true
+    stretchFactor: 1
+    children:
+
+      - type: LayoutBox
+        margin: large
+        stretchFactor: 1
+        children:
+
+          - type: LayoutBox
+            margin: large
+            cell:
+              column: 0
+              row: 0
+            stretchFactor: 1
+            children:
+
+              - type: Label
+                label: ''
+                children:
+
+                  - type: CheckBox
+                    name: distancePlot
+
+                  - type: CheckBox
+                    name: contributionPlot
+                    children:
+                      - type: TextBox
+                        name: angle
+                        format: number
+                        enable: (contributionPlot)
+                        suggestedValues:
+                          - value: 0
+                          - value: 45
+                          - value: 90

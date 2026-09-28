@@ -27,6 +27,13 @@ analyses:
     menuGroup: snowText
     menuTitle: Lexical Distribution
     menuSubgroup: Text Analysis
+  - title: Lexical Distribution Comparison
+    name: lexicalComparison
+    ns: snowText
+    category: analyses
+    menuGroup: snowText
+    menuTitle: Lexical Distribution Comparison
+    menuSubgroup: Text Analysis
 datasets:
   - name: text_profile
     path: text_profile.omv
@@ -38,6 +45,11 @@ datasets:
     description: Lexical distribution
     tags:
       - Lexical distribution
+  - name: comparison
+    path: comparison.omv
+    description: Lexical comparison
+    tags:
+      - Lexical comparison
 usesNative: true
 minApp: 1.0.8
 

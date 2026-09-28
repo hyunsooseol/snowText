@@ -1,0 +1,213 @@
+
+---
+name: lexicalComparison
+title: Lexical Distribution Comparison
+refs: snowText
+jrs: '1.1'
+
+items:
+
+    - name: instructions
+      title: Instructions
+      type: Html
+      visible: true
+
+
+    # ============================================================
+    # 1. Distribution Difference
+    # ============================================================
+
+    - name: distributionDifference
+      title: Distribution Difference
+      type: Table
+      visible: (distributionDifference)
+      clearWith:
+        - words
+        - freq
+        - group
+      columns:
+
+        - name: group1
+          title: Group 1
+          type: text
+
+        - name: group2
+          title: Group 2
+          type: text
+
+        - name: jsd
+          title: Jensen-Shannon
+          type: number
+
+        - name: hellinger
+          title: Hellinger
+          type: number
+
+        - name: brayCurtis
+          title: Bray-Curtis
+          type: number
+
+
+    # ============================================================
+    # 2. Vocabulary Overlap
+    # ============================================================
+
+    - name: vocabularyOverlap
+      title: Vocabulary Overlap
+      type: Table
+      visible: (vocabularyOverlap)
+      clearWith:
+        - words
+        - freq
+        - group
+      columns:
+
+        - name: group1
+          title: Group 1
+          type: text
+
+        - name: group2
+          title: Group 2
+          type: text
+
+        - name: vocabulary1
+          title: Vocabulary 1
+          type: integer
+
+        - name: vocabulary2
+          title: Vocabulary 2
+          type: integer
+
+        - name: sharedWords
+          title: Shared Words
+          type: integer
+
+        - name: unionWords
+          title: Union Words
+          type: integer
+
+        - name: jaccard
+          title: Jaccard Similarity
+          type: number
+
+        - name: sharedPct
+          title: Shared Vocabulary (%)
+          type: number
+
+
+    # ============================================================
+    # 3. Concentration Difference
+    # ============================================================
+
+    - name: concentrationDifference
+      title: Concentration Difference
+      type: Table
+      visible: (concentrationDifference)
+      clearWith:
+        - words
+        - freq
+        - group
+      columns:
+
+        - name: group
+          title: Group
+          type: text
+
+        - name: vocabulary
+          title: Vocabulary Size
+          type: integer
+
+        - name: tokens
+          title: Total Tokens
+          type: integer
+
+        - name: entropy
+          title: Shannon H
+          type: number
+
+        - name: normalizedEntropy
+          title: Normalized Entropy
+          type: number
+
+        - name: gini
+          title: Gini
+          type: number
+
+        - name: simpson
+          title: Simpson Concentration
+          type: number
+
+
+    # ============================================================
+    # 4. Contribution to Difference
+    # ============================================================
+
+    - name: contribution
+      title: Difference Breakdown
+      type: Table
+      visible: (contribution)
+      clearWith:
+        - words
+        - freq
+        - group
+      columns:
+
+        - name: group1
+          title: Group 1
+          type: text
+
+        - name: group2
+          title: Group 2
+          type: text
+
+        - name: category
+          title: Word Category
+          type: text
+
+        - name: wordCount
+          title: Words
+          type: integer
+
+        - name: jsContribution
+          title: JS Contribution
+          type: number
+
+        - name: contributionPct
+          title: Share of JS (%)
+          type: number
+          
+    # ============================================================
+    # 5. Distribution Distance Plot
+    # ============================================================
+
+    - name: distancePlot
+      title: Distribution Distance Plot
+      type: Image
+      width: 650
+      height: 450
+      renderFun: .plotDistance
+      visible: (distancePlot)
+      clearWith:
+        - words
+        - freq
+        - group
+
+
+    # ============================================================
+    # 6. Contribution Plot
+    # ============================================================
+
+    - name: contributionPlot
+      title: Contribution Plot
+      type: Image
+      width: 650
+      height: 450
+      renderFun: .plotContribution
+      visible: (contributionPlot)
+      clearWith:
+        - words
+        - freq
+        - group
+        - angle
+
+...

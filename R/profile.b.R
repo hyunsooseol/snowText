@@ -8,25 +8,53 @@ profileClass <- if (requireNamespace('jmvcore', quietly=TRUE)) R6::R6Class(
     # Add instance for HTMLWidget
     
     .init = function() {
-      private$.htmlwidget <- HTMLWidget$new() # Initialize the HTMLWidget instance
+      private$.htmlwidget <- HTMLWidget$new()
       
-      if (is.null(self$data) | is.null(self$options$vars)) 
-           {
+      if (is.null(self$data) || is.null(self$options$vars)) {
         self$results$instructions$setVisible(visible = TRUE)
-        
       }
-      self$results$instructions$setContent(private$.htmlwidget$generate_accordion(
-        title = "Instructions",
-        content = paste(
-          '<div style="border: 2px solid #e6f4fe; border-radius: 15px; padding: 15px; background-color: #e6f4fe; margin-top: 10px;">',
-          '<div style="text-align:justify;">',
-          '<ul>',
-          '<li>Feature requests and bug reports can be made on my <a href="https://github.com/hyunsooseol/snowText/issues" target="_blank">GitHub</a>.</li>',
-          '</ul></div></div>'
-          
+      
+      self$results$instructions$setContent(
+        private$.htmlwidget$generate_accordion(
+          title = "Instructions",
+          content = paste(
+            '<div style="border: 2px solid #e6f4fe;',
+            'border-radius: 15px; padding: 15px;',
+            'background-color: #e6f4fe; margin-top: 10px;">',
+            '<div style="text-align: justify;">',
+            
+            '<p><strong>Text Profile</strong> examines the quality',
+            'and relationships of document-level text measures.</p>',
+            
+            '<ul>',
+            '<li><strong>Text Variables:</strong> select numeric',
+            'measures, with one document per row.</li>',
+            '<li><strong>Length Variable:</strong> select a numeric',
+            'document length measure for length diagnostics.</li>',
+            '<li><strong>Grouping Variable:</strong> select a category',
+            'to compare profiles across groups.</li>',
+            '<li><strong>Document ID:</strong> optionally identify',
+            'documents flagged as outliers.</li>',
+            '</ul>',
+            
+            '<p>Use <strong>Profile Diagnostics</strong> to examine',
+            'data quality, length effects, adjusted relationships,',
+            'group differences, outliers, and redundancy.</p>',
+            
+            '<p>For Web Text Mining exports, use',
+            '<strong>core/document_analysis.csv</strong>.</p>',
+            
+            '<p>Feature requests and bug reports:',
+            '<a href="https://github.com/hyunsooseol/snowText/issues"',
+            'target="_blank">GitHub</a>.</p>',
+            
+            '</div></div>'
+          )
         )
-      ))
-    },    
+      )
+    },
+    
+    
     # ================================================================
     # Main analysis
     # ================================================================
