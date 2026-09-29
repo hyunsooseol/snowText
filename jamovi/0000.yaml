@@ -34,6 +34,18 @@ analyses:
     menuGroup: snowText
     menuTitle: Lexical Distribution Comparison
     menuSubgroup: Text Analysis
+  - title: Korean Lexicon Analysis
+    name: klexicon
+    ns: snowText
+    category: analyses
+    menuGroup: snowText
+    menuTitle: Korean Lexicon Analysis
+    menuSubgroup: Text Analysis
+    description: >-
+      Performs dictionary-based text analysis with Korean-oriented matching
+      rules. User-defined categories support exact terms, prefix wildcards, and
+      multi-word expressions. Optional Korean negation handling identifies and
+      adjusts lexicon matches occurring with nearby negation cues.
 datasets:
   - name: text_profile
     path: text_profile.omv
@@ -50,6 +62,11 @@ datasets:
     description: Lexical comparison
     tags:
       - Lexical comparison
+  - name: klexicon
+    path: klexicon.omv
+    description: Korean lexicon analysis
+    tags:
+      - Korean lexicon analysis
 usesNative: true
 minApp: 1.0.8
 

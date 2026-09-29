@@ -1,0 +1,271 @@
+---
+name: klexicon
+title: Korean Lexicon Analysis
+refs: snowText
+jrs: '1.1'
+
+items:
+
+    # ============================================================
+    # Instructions
+    # ============================================================
+
+    - name: instructions
+      title: Instructions
+      type: Html
+      visible: true
+
+
+    # ============================================================
+    # 1. Dictionary Summary
+    # ============================================================
+
+    - name: dictSummary
+      title: Dictionary Summary
+      type: Table
+      rows: 0
+      clearWith:
+        - textVar
+        - lexicon
+
+      columns:
+
+        - name: category
+          title: Category
+          type: text
+
+        - name: exactTerms
+          title: Exact Terms
+          type: integer
+
+        - name: wildcardPrefixes
+          title: Wildcard Prefixes
+          type: integer
+
+        - name: multiWordTerms
+          title: Multi-word Terms
+          type: integer
+
+
+    # ============================================================
+    # 2. Korean Matching Settings
+    # ============================================================
+
+    - name: matchingSummary
+      title: Korean Matching Settings
+      type: Table
+      rows: 0
+      clearWith:
+        - normalizeKorean
+        - negationMode
+        - negationWindow
+        - negationLexicon
+
+      columns:
+
+        - name: setting
+          title: Setting
+          type: text
+
+        - name: value
+          title: Value
+          type: text
+
+
+    # ============================================================
+    # 3. Category Counts Summary
+    # ============================================================
+
+    - name: catSummary
+      title: Category Counts Summary
+      type: Table
+      rows: 0
+      clearWith:
+        - textVar
+        - lexicon
+        - normalizeKorean
+        - negationMode
+        - negationWindow
+        - negationLexicon
+
+      columns:
+
+        - name: category
+          title: Category
+          type: text
+
+        - name: rawCount
+          title: Raw Matches
+          type: integer
+
+        - name: negatedCount
+          title: Negated Matches
+          type: integer
+
+        - name: adjustedCount
+          title: Adjusted Matches
+          type: integer
+
+        - name: meanCount
+          title: Mean / Doc
+          type: number
+
+        - name: meanPerc
+          title:  Mean Token Proportion
+          type: number
+
+        - name: docCount
+          title: Docs with Matches
+          type: integer
+
+        - name: docPerc
+          title: '% of Docs'
+          type: number
+
+
+    # ============================================================
+    # 4. Document-level Details
+    # ============================================================
+
+    - name: documentDetails
+      title: Matching Document Details
+      type: Table
+      rows: 0
+      visible: (documentDetails)
+      clearWith:
+        - textVar
+        - lexicon
+        - normalizeKorean
+        - negationMode
+        - negationWindow
+        - negationLexicon
+
+      columns:
+
+        - name: document
+          title: Document
+          type: integer
+
+        - name: category
+          title: Category
+          type: text
+
+        - name: tokens
+          title: Tokens
+          type: integer
+
+        - name: rawCount
+          title: Raw Matches
+          type: integer
+
+        - name: adjustedCount
+          title: Adjusted Matches
+          type: integer
+
+        - name: percentage
+          title:  Token Proportion
+          type: number
+
+        - name: detectedTerms
+          title: Raw Detected Terms
+          type: text
+
+
+    # ============================================================
+    # 5. Negation Evidence
+    # ============================================================
+
+    - name: negationEvidence
+      title: Negation Evidence
+      type: Table
+      rows: 0
+      visible: (negationEvidence)
+      clearWith:
+        - textVar
+        - lexicon
+        - normalizeKorean
+        - negationMode
+        - negationWindow
+        - negationLexicon
+
+      columns:
+
+        - name: document
+          title: Document
+          type: integer
+
+        - name: category
+          title: Category
+          type: text
+
+        - name: matchedTerm
+          title: Matched Term
+          type: text
+
+        - name: negationCue
+          title: Negation Cue
+          type: text
+
+        - name: context
+          title: Context
+          type: text
+
+        - name: action
+          title: Treatment
+          type: text
+
+
+    # ============================================================
+    # 6. Status
+    # ============================================================
+
+    - name: statusNote
+      title: Status
+      type: Preformatted
+      visible: false
+      clearWith:
+        - textVar
+        - lexicon
+        - normalizeKorean
+        - negationMode
+        - negationWindow
+        - negationLexicon
+
+# ============================================================
+# Category Match Plot
+# ============================================================
+
+    - name: categoryPlot
+      title: Category Match Plot
+      type: Image
+      width: 650
+      height: 450
+      renderFun: .plotCategoryMatches
+      visible: (categoryPlot)
+      clearWith:
+        - textVar
+        - lexicon
+        - normalizeKorean
+        - negationMode
+        - negationWindow
+        - negationCues
+
+
+    # ============================================================
+    # 7. Save to jamovi Data Set
+    # ============================================================
+
+    - name: saveResults
+      title: Append results to the data set
+      type: Output
+      initInRun: true
+      clearWith:
+        - textVar
+        - lexicon
+        - normalizeKorean
+        - negationMode
+        - negationWindow
+        - negationLexicon
+        - detectedWords
+
+...

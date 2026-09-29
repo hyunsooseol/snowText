@@ -1,0 +1,153 @@
+---
+name: klexicon
+title: Korean Lexicon Analysis
+menuGroup: snowText
+menuSubgroup: Text Analysis
+version: '1.0.0'
+jas: '1.2'
+
+description:
+    main: >-
+        Performs dictionary-based text analysis with Korean-oriented
+        matching rules. User-defined categories support exact terms,
+        prefix wildcards, and multi-word expressions. Optional Korean
+        negation handling identifies and adjusts lexicon matches occurring
+        with nearby negation cues.
+
+options:
+
+    # ============================================================
+    # Data
+    # ============================================================
+
+    - name: data
+      type: Data
+
+    - name: textVar
+      title: Text Variable
+      type: Variable
+      suggested:
+        - nominal
+      permitted:
+        - id
+        - factor
+
+
+    # ============================================================
+    # User Lexicon
+    # ============================================================
+
+    - name: lexicon
+      title: 'Lexicon: category and its terms'
+      type: Array
+      default:
+        - category: 긍정 정서
+          terms: 좋*, 만족*, 행복*, 기쁘*, 추천*
+
+        - category: 부정 정서
+          terms: 나쁘*, 실망*, 불만*, 불편*, 싫*
+
+        - category: 불안
+          terms: 불안*, 걱정*, 두렵*, 긴장*, 초조*
+
+        - category: 성취
+          terms: 성공*, 성취*, 달성*, 향상*, 발전*
+
+      template:
+        type: Group
+        elements:
+
+          - name: category
+            type: String
+            title: Category
+
+          - name: terms
+            type: String
+            title: 'Terms (comma-separated)'
+
+      description: |
+        Four example categories are provided by default.
+        Users may freely edit, remove, or add categories.
+        Enter terms as a comma-separated list.
+        A trailing * indicates prefix matching.
+        Multi-word expressions are allowed.
+
+
+    # ============================================================
+    # Korean Text Processing
+    # ============================================================
+
+    - name: normalizeKorean
+      title: Korean text normalization
+      type: Bool
+      default: true
+
+    - name: negationMode
+      title: Negation handling
+      type: List
+      options:
+        - title: No adjustment
+          name: none
+
+        - title: Flag only
+          name: flag
+
+        - title: Exclude negated matches
+          name: exclude
+
+      default: exclude
+
+    - name: negationWindow
+      title: Negation window
+      type: Integer
+      min: 1
+      max: 5
+      default: 1
+
+
+    # ============================================================
+    # Korean Negation Cues
+    # ============================================================
+
+    - name: negationCues
+      title: Korean Negation Cues
+      type: String
+      default: '않*, 못*, 안'
+      description: |
+        Enter Korean negation cues as a comma-separated list.
+        A trailing * indicates prefix matching.
+
+
+    # ============================================================
+    # Result Options
+    # ============================================================
+
+    - name: detectedWords
+      title: Detected terms
+      type: Bool
+      default: false
+
+    - name: documentDetails
+      title: Matching document details
+      type: Bool
+      default: false
+
+    - name: negationEvidence
+      title: Negation evidence
+      type: Bool
+      default: false
+
+
+    # ============================================================
+    # Save
+    # ============================================================
+
+    - name: saveResults
+      title: Append results to the data set
+      type: Output
+
+    - name: categoryPlot
+      title: Category Match Plot
+      type: Bool
+      default: false
+...
