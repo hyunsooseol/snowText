@@ -18,7 +18,8 @@ profile(
   adjustedRelationships = FALSE,
   profilePlot = FALSE,
   diagnosticMap = FALSE,
-  angle = 0
+  angle = 0,
+  contrastMap = FALSE
 )
 }
 \arguments{
@@ -49,6 +50,8 @@ profile(
 \item{diagnosticMap}{.}
 
 \item{angle}{.}
+
+\item{contrastMap}{.}
 }
 \value{
 A results object containing:
@@ -65,6 +68,7 @@ A results object containing:
   \code{results$adjustedRelationships} \tab \tab \tab \tab \tab a table \cr
   \code{results$profilePlot} \tab \tab \tab \tab \tab an image \cr
   \code{results$diagnosticMap} \tab \tab \tab \tab \tab an image \cr
+  \code{results$contrastMap} \tab \tab \tab \tab \tab an image \cr
 }
 
 Tables can be converted to data frames with \code{asDF} or \code{\link{as.data.frame}}. For example:

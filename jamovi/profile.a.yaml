@@ -97,4 +97,9 @@ options:
       min: 0
       max: 90
       default: 0
+
+    - name: contrastMap
+      title: Profile Contrast Map
+      type: Bool
+      default: false      
 ...

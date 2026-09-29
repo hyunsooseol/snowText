@@ -120,4 +120,7 @@ children:
                           - value: 90
 
                   - type: CheckBox
-                    name: diagnosticMap                    
+                    name: diagnosticMap 
+
+                  - type: CheckBox
+                    name: contrastMap                    

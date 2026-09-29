@@ -343,6 +343,19 @@ items:
         - lengthVar
         - group
 
+    # ============================================================
+    # Profile Contrast Map
+    # ============================================================
 
+    - name: contrastMap
+      title: Profile Contrast Map
+      type: Image
+      width: 650
+      height: 450
+      renderFun: .plotContrastMap
+      visible: (contrastMap)
+      clearWith:
+        - vars
+        - group
 
 ...

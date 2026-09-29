@@ -18,7 +18,8 @@ profileOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
             adjustedRelationships = FALSE,
             profilePlot = FALSE,
             diagnosticMap = FALSE,
-            angle = 0, ...) {
+            angle = 0,
+            contrastMap = FALSE, ...) {
 
             super$initialize(
                 package="snowText",
@@ -92,6 +93,10 @@ profileOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                 min=0,
                 max=90,
                 default=0)
+            private$..contrastMap <- jmvcore::OptionBool$new(
+                "contrastMap",
+                contrastMap,
+                default=FALSE)
 
             self$.addOption(private$..vars)
             self$.addOption(private$..lengthVar)
@@ -106,6 +111,7 @@ profileOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
             self$.addOption(private$..profilePlot)
             self$.addOption(private$..diagnosticMap)
             self$.addOption(private$..angle)
+            self$.addOption(private$..contrastMap)
         }),
     active = list(
         vars = function() private$..vars$value,
@@ -120,7 +126,8 @@ profileOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
         adjustedRelationships = function() private$..adjustedRelationships$value,
         profilePlot = function() private$..profilePlot$value,
         diagnosticMap = function() private$..diagnosticMap$value,
-        angle = function() private$..angle$value),
+        angle = function() private$..angle$value,
+        contrastMap = function() private$..contrastMap$value),
     private = list(
         ..vars = NA,
         ..lengthVar = NA,
@@ -134,7 +141,8 @@ profileOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
         ..adjustedRelationships = NA,
         ..profilePlot = NA,
         ..diagnosticMap = NA,
-        ..angle = NA)
+        ..angle = NA,
+        ..contrastMap = NA)
 )
 
 profileResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
@@ -152,7 +160,8 @@ profileResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
         dataQualitySummary = function() private$.items[["dataQualitySummary"]],
         adjustedRelationships = function() private$.items[["adjustedRelationships"]],
         profilePlot = function() private$.items[["profilePlot"]],
-        diagnosticMap = function() private$.items[["diagnosticMap"]]),
+        diagnosticMap = function() private$.items[["diagnosticMap"]],
+        contrastMap = function() private$.items[["contrastMap"]]),
     private = list(),
     public=list(
         initialize=function(options) {
@@ -457,6 +466,17 @@ profileResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                 clearWith=list(
                     "vars",
                     "lengthVar",
+                    "group")))
+            self$add(jmvcore::Image$new(
+                options=options,
+                name="contrastMap",
+                title="Profile Contrast Map",
+                width=650,
+                height=450,
+                renderFun=".plotContrastMap",
+                visible="(contrastMap)",
+                clearWith=list(
+                    "vars",
                     "group")))}))
 
 profileBase <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
@@ -497,6 +517,7 @@ profileBase <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
 #' @param profilePlot .
 #' @param diagnosticMap .
 #' @param angle .
+#' @param contrastMap .
 #' @return A results object containing:
 #' \tabular{llllll}{
 #'   \code{results$instructions} \tab \tab \tab \tab \tab a html \cr
@@ -511,6 +532,7 @@ profileBase <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
 #'   \code{results$adjustedRelationships} \tab \tab \tab \tab \tab a table \cr
 #'   \code{results$profilePlot} \tab \tab \tab \tab \tab an image \cr
 #'   \code{results$diagnosticMap} \tab \tab \tab \tab \tab an image \cr
+#'   \code{results$contrastMap} \tab \tab \tab \tab \tab an image \cr
 #' }
 #'
 #' Tables can be converted to data frames with \code{asDF} or \code{\link{as.data.frame}}. For example:
@@ -534,7 +556,8 @@ profile <- function(
     adjustedRelationships = FALSE,
     profilePlot = FALSE,
     diagnosticMap = FALSE,
-    angle = 0) {
+    angle = 0,
+    contrastMap = FALSE) {
 
     if ( ! requireNamespace("jmvcore", quietly=TRUE))
         stop("profile requires jmvcore to be installed (restart may be required)")
@@ -567,7 +590,8 @@ profile <- function(
         adjustedRelationships = adjustedRelationships,
         profilePlot = profilePlot,
         diagnosticMap = diagnosticMap,
-        angle = angle)
+        angle = angle,
+        contrastMap = contrastMap)
 
     analysis <- profileClass$new(
         options = options,

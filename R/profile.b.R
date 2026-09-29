@@ -1534,6 +1534,149 @@ profileClass <- if (requireNamespace('jmvcore', quietly=TRUE)) R6::R6Class(
         )
       }
       
+      # ------------------------------------------------------------
+      # Profile Contrast Map
+      # ------------------------------------------------------------
+      
+      if (isTRUE(self$options$contrastMap)) {
+        
+        groupVar <- self$options$group
+        
+        state <- list(
+          valid = FALSE,
+          message = 'Select a Grouping Variable to display profile contrasts.'
+        )
+        
+        if (! is.null(groupVar) &&
+            length(groupVar) == 1 &&
+            groupVar != '' &&
+            groupVar %in% names(data) &&
+            length(vars) >= 2) {
+          
+          X <- private$.numericMatrix(data, vars)
+          g <- data[[groupVar]]
+          
+          if (! is.factor(g))
+            g <- factor(g)
+          
+          complete <- stats::complete.cases(X) & !is.na(g)
+          
+          Xcc <- X[complete, , drop = FALSE]
+          gcc <- droplevels(g[complete])
+          
+          if (nrow(Xcc) >= 3 && nlevels(gcc) >= 2) {
+            
+            # Remove constant measures before standardization
+            sdValues <- apply(Xcc, 2, stats::sd)
+            keep <- is.finite(sdValues) & sdValues > 0
+            
+            Xuse <- Xcc[, keep, drop = FALSE]
+            plotVars <- colnames(Xuse)
+            
+            if (ncol(Xuse) >= 2) {
+              
+              # Use the same pooled standardization as Text Profile Plot
+              means <- colMeans(Xuse)
+              sds <- apply(Xuse, 2, stats::sd)
+              
+              Z <- sweep(Xuse, 2, means, FUN = '-')
+              Z <- sweep(Z, 2, sds, FUN = '/')
+              
+              groupLevels <- levels(gcc)
+              
+              profileMeans <- lapply(
+                groupLevels,
+                function(level) {
+                  
+                  rows <- gcc == level
+                  
+                  colMeans(
+                    Z[rows, , drop = FALSE],
+                    na.rm = TRUE
+                  )
+                }
+              )
+              
+              profileMeans <- do.call(rbind, profileMeans)
+              rownames(profileMeans) <- groupLevels
+              colnames(profileMeans) <- plotVars
+              
+              # ----------------------------------------------------
+              # Pairwise profile contrasts
+              #
+              # Delta z = mean z of first group
+              #           - mean z of second group
+              # ----------------------------------------------------
+              
+              pairIndex <- utils::combn(
+                seq_along(groupLevels),
+                2
+              )
+              
+              contrastLabels <- character(ncol(pairIndex))
+              
+              contrastMatrix <- matrix(
+                NA_real_,
+                nrow = ncol(pairIndex),
+                ncol = length(plotVars),
+                dimnames = list(
+                  NULL,
+                  plotVars
+                )
+              )
+              
+              for (k in seq_len(ncol(pairIndex))) {
+                
+                i <- pairIndex[1, k]
+                j <- pairIndex[2, k]
+                
+                contrastLabels[k] <- paste0(
+                  groupLevels[i],
+                  ' \u2212 ',
+                  groupLevels[j]
+                )
+                
+                contrastMatrix[k, ] <-
+                  profileMeans[i, ] -
+                  profileMeans[j, ]
+              }
+              
+              rownames(contrastMatrix) <- contrastLabels
+              
+              state <- list(
+                valid = TRUE,
+                variables = plotVars,
+                contrasts = contrastLabels,
+                delta = contrastMatrix
+              )
+              
+            } else {
+              
+              state$message <- paste(
+                'At least two non-constant Text Variables are required',
+                'for the Profile Contrast Map.'
+              )
+            }
+            
+          } else {
+            
+            state$message <- paste(
+              'At least two observed groups and sufficient complete cases',
+              'are required for the Profile Contrast Map.'
+            )
+          }
+          
+        } else if (length(vars) < 2) {
+          
+          state$message <- paste(
+            'At least two Text Variables are required',
+            'for the Profile Contrast Map.'
+          )
+        }
+        
+        self$results$contrastMap$setState(state)
+      }
+      
     },
     
     
@@ -1806,6 +1949,215 @@ profileClass <- if (requireNamespace('jmvcore', quietly=TRUE)) R6::R6Class(
       TRUE
     },
     
+    # ================================================================
+    # Profile Contrast Map
+    # ================================================================
+    
+    # ================================================================
+    # Profile Contrast Map
+    # ================================================================
+    
+    .plotContrastMap = function(
+    image,
+    ggtheme,
+    theme,
+    ...
+    ) {
+      
+      state <- image$state
+      
+      if (is.null(state))
+        return(FALSE)
+      
+      # ------------------------------------------------------------
+      # Invalid state
+      # ------------------------------------------------------------
+      
+      if (isFALSE(state$valid)) {
+        
+        message <- if (!is.null(state$message))
+          as.character(state$message)
+        else
+          'The Profile Contrast Map is not available for the current selections.'
+        
+        plot <- ggplot2::ggplot() +
+          ggplot2::annotate(
+            'text',
+            x = 0,
+            y = 0,
+            label = message,
+            size = 4
+          ) +
+          ggplot2::xlim(-1, 1) +
+          ggplot2::ylim(-1, 1) +
+          ggplot2::labs(
+            x = NULL,
+            y = NULL
+          ) +
+          ggtheme +
+          ggplot2::theme(
+            axis.text = ggplot2::element_blank(),
+            axis.ticks = ggplot2::element_blank(),
+            panel.grid = ggplot2::element_blank()
+          )
+        
+        print(plot)
+        
+        return(TRUE)
+      }
+      
+      if (is.null(state$variables) ||
+          is.null(state$contrasts) ||
+          is.null(state$delta))
+        return(FALSE)
+      
+      variables <- as.character(state$variables)
+      contrasts <- as.character(state$contrasts)
+      delta <- as.matrix(state$delta)
+      
+      if (length(variables) < 2 ||
+          length(contrasts) < 1 ||
+          nrow(delta) != length(contrasts) ||
+          ncol(delta) != length(variables))
+        return(FALSE)
+      
+      # ------------------------------------------------------------
+      # Plot data
+      # ------------------------------------------------------------
+      
+      plotData <- expand.grid(
+        Variable = variables,
+        Contrast = contrasts,
+        stringsAsFactors = FALSE
+      )
+      
+      plotData$DeltaZ <- as.vector(t(delta))
+      
+      plotData <- plotData[
+        is.finite(plotData$DeltaZ),
+        ,
+        drop = FALSE
+      ]
+      
+      if (nrow(plotData) == 0)
+        return(FALSE)
+      
+      plotData$Variable <- factor(
+        plotData$Variable,
+        levels = rev(variables)
+      )
+      
+      plotData$Contrast <- factor(
+        plotData$Contrast,
+        levels = contrasts
+      )
+      
+      # ------------------------------------------------------------
+      # Largest profile contrast
+      # ------------------------------------------------------------
+      
+      largestIndex <- which.max(
+        abs(plotData$DeltaZ)
+      )
+      
+      largestContrast <- as.character(
+        plotData$Contrast[largestIndex]
+      )
+      
+      largestVariable <- as.character(
+        plotData$Variable[largestIndex]
+      )
+      
+      largestDelta <- plotData$DeltaZ[largestIndex]
+      
+      summaryText <- sprintf(
+        'Largest: %s | %s | \u0394z = %+.2f',
+        largestContrast,
+        largestVariable,
+        largestDelta
+      )
+      
+      # Automatically rotate labels when many contrasts are displayed
+      contrastAngle <- if (length(contrasts) >= 5) 45 else 0
+      
+      # ------------------------------------------------------------
+      # Symmetric colour scale centred at zero
+      # ------------------------------------------------------------
+      
+      maxAbs <- max(
+        abs(plotData$DeltaZ),
+        na.rm = TRUE
+      )
+      
+      if (!is.finite(maxAbs) ||
+          maxAbs <= sqrt(.Machine$double.eps))
+        maxAbs <- 1
+      
+      textColour <- ifelse(
+        abs(plotData$DeltaZ) >= 0.60 * maxAbs,
+        '#FFFFFF',
+        '#222222'
+      )
+      
+      # ------------------------------------------------------------
+      # Plot
+      # ------------------------------------------------------------
+      
+      plot <- ggplot2::ggplot(
+        plotData,
+        ggplot2::aes(
+          x = Contrast,
+          y = Variable,
+          fill = DeltaZ
+        )
+      ) +
+        ggplot2::geom_tile(
+          colour = '#FFFFFF',
+          linewidth = 0.8
+        ) +
+        ggplot2::geom_text(
+          label = sprintf(
+            '%+.2f',
+            plotData$DeltaZ
+          ),
+          colour = textColour,
+          size = 3.5
+        ) +
+        
+        ggtheme +
+        
+        ggplot2::scale_fill_gradient2(
+          low = '#C62828',
+          mid = '#FFFFFF',
+          high = '#1565C0',
+          midpoint = 0,
+          limits = c(
+            -maxAbs,
+            maxAbs
+          ),
+          name = expression(Delta * z)
+        ) +
+        
+        ggplot2::labs(
+          subtitle = summaryText,
+          x = 'Group Contrast',
+          y = NULL
+        ) +
+        
+        ggplot2::theme(
+          panel.grid = ggplot2::element_blank(),
+          axis.ticks = ggplot2::element_blank(),
+          legend.position = 'right',
+          axis.text.x = ggplot2::element_text(
+            angle = contrastAngle,
+            hjust = if (contrastAngle == 0) 0.5 else 1
+          )
+        )
+      
+      print(plot)
+      
+      TRUE
+    },
     
     # ================================================================
     # Helper: safe numeric conversion
