@@ -2,7 +2,7 @@
 name: klexicon
 title: Korean Lexicon Analysis
 menuGroup: snowText
-menuSubgroup: Text Analysis
+menuSubgroup: Lexicon Analysis
 version: '1.0.0'
 jas: '1.2'
 

@@ -2,7 +2,7 @@
 name:  profile
 title: Text Profile
 menuGroup: snowText
-menuSubgroup: Text Analysis
+menuSubgroup: Descriptive Analysis
 version:  '1.0.0'
 jas: '1.2'
 

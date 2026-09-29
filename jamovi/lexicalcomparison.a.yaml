@@ -2,7 +2,7 @@
 name: lexicalComparison
 title: Lexical Distribution Comparison
 menuGroup: snowText
-menuSubgroup: Text Analysis
+menuSubgroup: Descriptive Analysis
 version: '1.0.0'
 jas: '1.2'
 

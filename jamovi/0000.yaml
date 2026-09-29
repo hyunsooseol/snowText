@@ -19,28 +19,28 @@ analyses:
     category: analyses
     menuGroup: snowText
     menuTitle: Text Profile
-    menuSubgroup: Text Analysis
+    menuSubgroup: Descriptive Analysis
   - title: Lexical Distribution
     name: lexical
     ns: snowText
     category: analyses
     menuGroup: snowText
     menuTitle: Lexical Distribution
-    menuSubgroup: Text Analysis
+    menuSubgroup: Descriptive Analysis
   - title: Lexical Distribution Comparison
     name: lexicalComparison
     ns: snowText
     category: analyses
     menuGroup: snowText
     menuTitle: Lexical Distribution Comparison
-    menuSubgroup: Text Analysis
+    menuSubgroup: Descriptive Analysis
   - title: Korean Lexicon Analysis
     name: klexicon
     ns: snowText
     category: analyses
     menuGroup: snowText
     menuTitle: Korean Lexicon Analysis
-    menuSubgroup: Text Analysis
+    menuSubgroup: Lexicon Analysis
     description: >-
       Performs dictionary-based text analysis with Korean-oriented matching
       rules. User-defined categories support exact terms, prefix wildcards, and
