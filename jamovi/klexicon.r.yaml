@@ -27,6 +27,7 @@ items:
       clearWith:
         - textVar
         - lexicon
+        - normalizeKorean
 
       columns:
 
@@ -59,7 +60,7 @@ items:
         - normalizeKorean
         - negationMode
         - negationWindow
-        - negationLexicon
+        - negationCues
 
       columns:
 
@@ -86,7 +87,7 @@ items:
         - normalizeKorean
         - negationMode
         - negationWindow
-        - negationLexicon
+        - negationCues
 
       columns:
 
@@ -138,7 +139,7 @@ items:
         - normalizeKorean
         - negationMode
         - negationWindow
-        - negationLexicon
+        - negationCues
 
       columns:
 
@@ -186,7 +187,7 @@ items:
         - normalizeKorean
         - negationMode
         - negationWindow
-        - negationLexicon
+        - negationCues
 
       columns:
 
@@ -229,7 +230,7 @@ items:
         - normalizeKorean
         - negationMode
         - negationWindow
-        - negationLexicon
+        - negationCues
 
 # ============================================================
 # Category Match Plot
@@ -284,7 +285,7 @@ items:
         - normalizeKorean
         - negationMode
         - negationWindow
-        - negationLexicon
+        - negationCues
         - detectedWords
 
 ...

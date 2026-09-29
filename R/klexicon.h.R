@@ -174,7 +174,8 @@ klexiconResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                 rows=0,
                 clearWith=list(
                     "textVar",
-                    "lexicon"),
+                    "lexicon",
+                    "normalizeKorean"),
                 columns=list(
                     list(
                         `name`="category", 
@@ -201,7 +202,7 @@ klexiconResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                     "normalizeKorean",
                     "negationMode",
                     "negationWindow",
-                    "negationLexicon"),
+                    "negationCues"),
                 columns=list(
                     list(
                         `name`="setting", 
@@ -222,7 +223,7 @@ klexiconResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                     "normalizeKorean",
                     "negationMode",
                     "negationWindow",
-                    "negationLexicon"),
+                    "negationCues"),
                 columns=list(
                     list(
                         `name`="category", 
@@ -268,7 +269,7 @@ klexiconResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                     "normalizeKorean",
                     "negationMode",
                     "negationWindow",
-                    "negationLexicon"),
+                    "negationCues"),
                 columns=list(
                     list(
                         `name`="document", 
@@ -310,7 +311,7 @@ klexiconResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                     "normalizeKorean",
                     "negationMode",
                     "negationWindow",
-                    "negationLexicon"),
+                    "negationCues"),
                 columns=list(
                     list(
                         `name`="document", 
@@ -347,7 +348,7 @@ klexiconResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                     "normalizeKorean",
                     "negationMode",
                     "negationWindow",
-                    "negationLexicon")))
+                    "negationCues")))
             self$add(jmvcore::Image$new(
                 options=options,
                 name="categoryPlot",
@@ -389,7 +390,7 @@ klexiconResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                     "normalizeKorean",
                     "negationMode",
                     "negationWindow",
-                    "negationLexicon",
+                    "negationCues",
                     "detectedWords")))}))
 
 klexiconBase <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(

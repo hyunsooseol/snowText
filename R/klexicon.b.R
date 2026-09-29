@@ -174,7 +174,7 @@
 # on the final token, e.g. "매우 만족*".
 # ------------------------------------------------
 
-.klex_parse_terms <- function(x) {
+.klex_parse_terms <- function(x, normalize = TRUE) {
   
   if (is.null(x) ||
       length(x) == 0L ||
@@ -220,7 +220,7 @@
     
     norm_term <- .klex_normalize_text(
       term2,
-      normalize = TRUE
+      normalize = normalize
     )
     
     if (!nzchar(norm_term))
@@ -263,7 +263,7 @@
 # Parse lexicon Array from jamovi
 # ------------------------------------------------
 
-.klex_parse_lexicon <- function(lexicon) {
+.klex_parse_lexicon <- function(lexicon, normalize = TRUE) {
   
   categories <- character()
   entries <- list()
@@ -292,7 +292,7 @@
         !nzchar(terms))
       next
     
-    parsed <- .klex_parse_terms(terms)
+    parsed <- .klex_parse_terms(terms, normalize = normalize)
     
     n_terms <-
       length(parsed$exact) +
@@ -329,9 +329,9 @@
 # Parse Korean negation cues
 # ------------------------------------------------
 
-.klex_parse_negation_cues <- function(x) {
+.klex_parse_negation_cues <- function(x, normalize = TRUE) {
   
-  parsed <- .klex_parse_terms(x)
+  parsed <- .klex_parse_terms(x, normalize = normalize)
   
   # Negation cues should normally be one-token expressions.
   # Multi-word expressions are retained for future compatibility,
@@ -699,9 +699,9 @@
 # Resolve dictionary and validate user input
 # ------------------------------------------------
 
-.klex_resolve_dictionary <- function(lexicon) {
+.klex_resolve_dictionary <- function(lexicon, normalize = TRUE) {
   
-  dict <- .klex_parse_lexicon(lexicon)
+  dict <- .klex_parse_lexicon(lexicon, normalize = normalize)
   
   if (length(dict$categories) == 0L) {
     
@@ -871,7 +871,8 @@ klexiconClass <- if (requireNamespace(
       dict <- tryCatch(
         
         .klex_resolve_dictionary(
-          self$options$lexicon
+          self$options$lexicon,
+          normalize = isTRUE(self$options$normalizeKorean)
         ),
         
         error = function(e)
@@ -907,7 +908,8 @@ klexiconClass <- if (requireNamespace(
       # ----------------------------------------------------
       
       dict <- .klex_resolve_dictionary(
-        self$options$lexicon
+        self$options$lexicon,
+        normalize = isTRUE(self$options$normalizeKorean)
       )
       
       # ----------------------------------------------------
@@ -1027,7 +1029,8 @@ klexiconClass <- if (requireNamespace(
       # ----------------------------------------------------
       
       neg_cues <- .klex_parse_negation_cues(
-        self$options$negationCues
+        self$options$negationCues,
+        normalize = isTRUE(self$options$normalizeKorean)
       )
       
       use_negation <-
@@ -1350,7 +1353,7 @@ klexiconClass <- if (requireNamespace(
               docs_with_matches,
             docPerc =
               if (n_docs > 0L)
-                docs_with_matches /
+                100 * docs_with_matches /
               n_docs
             else
               0

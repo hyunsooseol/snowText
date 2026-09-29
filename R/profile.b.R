@@ -390,6 +390,12 @@ profileClass <- if (requireNamespace('jmvcore', quietly=TRUE)) R6::R6Class(
               var1 <- vars[i]
               var2 <- vars[j]
               
+              # A control variable cannot have a partial correlation
+              # with another measure after controlling for itself.
+              if (identical(var1, lengthVar) ||
+                  identical(var2, lengthVar))
+                next
+              
               xAll <- private$.numeric(data[[var1]])
               yAll <- private$.numeric(data[[var2]])
               
@@ -429,8 +435,18 @@ profileClass <- if (requireNamespace('jmvcore', quietly=TRUE)) R6::R6Class(
                   rx <- stats::residuals(fitX)
                   ry <- stats::residuals(fitY)
                   
-                  if (length(unique(rx)) > 1 &&
-                      length(unique(ry)) > 1) {
+                  # Reject numerically zero residual variance using
+                  # each measure's original variance as its scale.
+                  # This avoids correlations based on round-off noise
+                  # while remaining invariant to changes of units.
+                  residualVarX <- stats::var(rx)
+                  residualVarY <- stats::var(ry)
+                  varianceTolerance <- .Machine$double.eps
+                  
+                  if (is.finite(residualVarX) &&
+                      is.finite(residualVarY) &&
+                      residualVarX > varianceTolerance * stats::var(x) &&
+                      residualVarY > varianceTolerance * stats::var(y)) {
                     
                     partialR <- suppressWarnings(
                       stats::cor(rx, ry, method = 'pearson')
@@ -483,7 +499,7 @@ profileClass <- if (requireNamespace('jmvcore', quietly=TRUE)) R6::R6Class(
           
           table$setNote(
             key  = 'method',
-            note = 'Partial correlations are Pearson correlations between residuals after regressing each text measure on the selected Length Variable.'
+            note = 'Partial correlations are Pearson correlations between residuals after regressing each text measure on the selected Length Variable. Pairs involving the Length Variable itself are omitted. Correlations and significance tests are not estimated when either residual variance is numerically zero.'
           )
           
           table$setNote(
@@ -2169,7 +2185,10 @@ profileClass <- if (requireNamespace('jmvcore', quietly=TRUE)) R6::R6Class(
         jmvcore::toNumeric(x)
       )
       
-      as.numeric(result)
+      result <- as.numeric(result)
+      result[!is.finite(result)] <- NA_real_
+      
+      result
     },
     
     
