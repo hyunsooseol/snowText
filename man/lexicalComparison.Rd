@@ -15,7 +15,8 @@ lexicalComparison(
   contribution = FALSE,
   distancePlot = FALSE,
   contributionPlot = FALSE,
-  angle = 0
+  angle = 0,
+  differentialVocabularyPlot = FALSE
 )
 }
 \arguments{
@@ -40,6 +41,8 @@ lexicalComparison(
 \item{contributionPlot}{.}
 
 \item{angle}{.}
+
+\item{differentialVocabularyPlot}{.}
 }
 \value{
 A results object containing:
@@ -51,6 +54,7 @@ A results object containing:
   \code{results$contribution} \tab \tab \tab \tab \tab a table \cr
   \code{results$distancePlot} \tab \tab \tab \tab \tab an image \cr
   \code{results$contributionPlot} \tab \tab \tab \tab \tab an image \cr
+  \code{results$differentialVocabularyPlot} \tab \tab \tab \tab \tab an image \cr
 }
 
 Tables can be converted to data frames with \code{asDF} or \code{\link{as.data.frame}}. For example:

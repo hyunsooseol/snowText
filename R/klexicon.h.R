@@ -19,7 +19,8 @@ klexiconOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
             detectedWords = FALSE,
             documentDetails = FALSE,
             negationEvidence = FALSE,
-            categoryPlot = FALSE, ...) {
+            categoryPlot = FALSE,
+            negationImpactPlot = FALSE, ...) {
 
             super$initialize(
                 package="snowText",
@@ -93,6 +94,10 @@ klexiconOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                 "categoryPlot",
                 categoryPlot,
                 default=FALSE)
+            private$..negationImpactPlot <- jmvcore::OptionBool$new(
+                "negationImpactPlot",
+                negationImpactPlot,
+                default=FALSE)
 
             self$.addOption(private$..textVar)
             self$.addOption(private$..lexicon)
@@ -105,6 +110,7 @@ klexiconOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
             self$.addOption(private$..negationEvidence)
             self$.addOption(private$..saveResults)
             self$.addOption(private$..categoryPlot)
+            self$.addOption(private$..negationImpactPlot)
         }),
     active = list(
         textVar = function() private$..textVar$value,
@@ -117,7 +123,8 @@ klexiconOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
         documentDetails = function() private$..documentDetails$value,
         negationEvidence = function() private$..negationEvidence$value,
         saveResults = function() private$..saveResults$value,
-        categoryPlot = function() private$..categoryPlot$value),
+        categoryPlot = function() private$..categoryPlot$value,
+        negationImpactPlot = function() private$..negationImpactPlot$value),
     private = list(
         ..textVar = NA,
         ..lexicon = NA,
@@ -129,7 +136,8 @@ klexiconOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
         ..documentDetails = NA,
         ..negationEvidence = NA,
         ..saveResults = NA,
-        ..categoryPlot = NA)
+        ..categoryPlot = NA,
+        ..negationImpactPlot = NA)
 )
 
 klexiconResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
@@ -144,6 +152,7 @@ klexiconResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
         negationEvidence = function() private$.items[["negationEvidence"]],
         statusNote = function() private$.items[["statusNote"]],
         categoryPlot = function() private$.items[["categoryPlot"]],
+        negationImpactPlot = function() private$.items[["negationImpactPlot"]],
         saveResults = function() private$.items[["saveResults"]]),
     private = list(),
     public=list(
@@ -354,6 +363,21 @@ klexiconResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                     "negationMode",
                     "negationWindow",
                     "negationCues")))
+            self$add(jmvcore::Image$new(
+                options=options,
+                name="negationImpactPlot",
+                title="Negation Impact Plot",
+                width=650,
+                height=450,
+                renderFun=".plotNegationImpact",
+                visible="(negationImpactPlot)",
+                clearWith=list(
+                    "textVar",
+                    "lexicon",
+                    "normalizeKorean",
+                    "negationMode",
+                    "negationWindow",
+                    "negationCues")))
             self$add(jmvcore::Output$new(
                 options=options,
                 name="saveResults",
@@ -410,6 +434,7 @@ klexiconBase <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
 #' @param documentDetails .
 #' @param negationEvidence .
 #' @param categoryPlot .
+#' @param negationImpactPlot .
 #' @return A results object containing:
 #' \tabular{llllll}{
 #'   \code{results$instructions} \tab \tab \tab \tab \tab a html \cr
@@ -420,6 +445,7 @@ klexiconBase <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
 #'   \code{results$negationEvidence} \tab \tab \tab \tab \tab a table \cr
 #'   \code{results$statusNote} \tab \tab \tab \tab \tab a preformatted \cr
 #'   \code{results$categoryPlot} \tab \tab \tab \tab \tab an image \cr
+#'   \code{results$negationImpactPlot} \tab \tab \tab \tab \tab an image \cr
 #'   \code{results$saveResults} \tab \tab \tab \tab \tab an output \cr
 #' }
 #'
@@ -445,7 +471,8 @@ klexicon <- function(
     detectedWords = FALSE,
     documentDetails = FALSE,
     negationEvidence = FALSE,
-    categoryPlot = FALSE) {
+    categoryPlot = FALSE,
+    negationImpactPlot = FALSE) {
 
     if ( ! requireNamespace("jmvcore", quietly=TRUE))
         stop("klexicon requires jmvcore to be installed (restart may be required)")
@@ -467,7 +494,8 @@ klexicon <- function(
         detectedWords = detectedWords,
         documentDetails = documentDetails,
         negationEvidence = negationEvidence,
-        categoryPlot = categoryPlot)
+        categoryPlot = categoryPlot,
+        negationImpactPlot = negationImpactPlot)
 
     analysis <- klexiconClass$new(
         options = options,

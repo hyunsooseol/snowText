@@ -15,7 +15,8 @@ lexicalComparisonOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R
             contribution = FALSE,
             distancePlot = FALSE,
             contributionPlot = FALSE,
-            angle = 0, ...) {
+            angle = 0,
+            differentialVocabularyPlot = FALSE, ...) {
 
             super$initialize(
                 package="snowText",
@@ -74,6 +75,10 @@ lexicalComparisonOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R
                 min=0,
                 max=90,
                 default=0)
+            private$..differentialVocabularyPlot <- jmvcore::OptionBool$new(
+                "differentialVocabularyPlot",
+                differentialVocabularyPlot,
+                default=FALSE)
 
             self$.addOption(private$..words)
             self$.addOption(private$..freq)
@@ -85,6 +90,7 @@ lexicalComparisonOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R
             self$.addOption(private$..distancePlot)
             self$.addOption(private$..contributionPlot)
             self$.addOption(private$..angle)
+            self$.addOption(private$..differentialVocabularyPlot)
         }),
     active = list(
         words = function() private$..words$value,
@@ -96,7 +102,8 @@ lexicalComparisonOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R
         contribution = function() private$..contribution$value,
         distancePlot = function() private$..distancePlot$value,
         contributionPlot = function() private$..contributionPlot$value,
-        angle = function() private$..angle$value),
+        angle = function() private$..angle$value,
+        differentialVocabularyPlot = function() private$..differentialVocabularyPlot$value),
     private = list(
         ..words = NA,
         ..freq = NA,
@@ -107,7 +114,8 @@ lexicalComparisonOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R
         ..contribution = NA,
         ..distancePlot = NA,
         ..contributionPlot = NA,
-        ..angle = NA)
+        ..angle = NA,
+        ..differentialVocabularyPlot = NA)
 )
 
 lexicalComparisonResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
@@ -120,7 +128,8 @@ lexicalComparisonResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R
         concentrationDifference = function() private$.items[["concentrationDifference"]],
         contribution = function() private$.items[["contribution"]],
         distancePlot = function() private$.items[["distancePlot"]],
-        contributionPlot = function() private$.items[["contributionPlot"]]),
+        contributionPlot = function() private$.items[["contributionPlot"]],
+        differentialVocabularyPlot = function() private$.items[["differentialVocabularyPlot"]]),
     private = list(),
     public=list(
         initialize=function(options) {
@@ -302,7 +311,19 @@ lexicalComparisonResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R
                     "words",
                     "freq",
                     "group",
-                    "angle")))}))
+                    "angle")))
+            self$add(jmvcore::Image$new(
+                options=options,
+                name="differentialVocabularyPlot",
+                title="Differential Vocabulary Map",
+                width=650,
+                height=450,
+                renderFun=".plotDifferentialVocabulary",
+                visible="(differentialVocabularyPlot)",
+                clearWith=list(
+                    "words",
+                    "freq",
+                    "group")))}))
 
 lexicalComparisonBase <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
     "lexicalComparisonBase",
@@ -339,6 +360,7 @@ lexicalComparisonBase <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Cl
 #' @param distancePlot .
 #' @param contributionPlot .
 #' @param angle .
+#' @param differentialVocabularyPlot .
 #' @return A results object containing:
 #' \tabular{llllll}{
 #'   \code{results$instructions} \tab \tab \tab \tab \tab a html \cr
@@ -348,6 +370,7 @@ lexicalComparisonBase <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Cl
 #'   \code{results$contribution} \tab \tab \tab \tab \tab a table \cr
 #'   \code{results$distancePlot} \tab \tab \tab \tab \tab an image \cr
 #'   \code{results$contributionPlot} \tab \tab \tab \tab \tab an image \cr
+#'   \code{results$differentialVocabularyPlot} \tab \tab \tab \tab \tab an image \cr
 #' }
 #'
 #' Tables can be converted to data frames with \code{asDF} or \code{\link{as.data.frame}}. For example:
@@ -368,7 +391,8 @@ lexicalComparison <- function(
     contribution = FALSE,
     distancePlot = FALSE,
     contributionPlot = FALSE,
-    angle = 0) {
+    angle = 0,
+    differentialVocabularyPlot = FALSE) {
 
     if ( ! requireNamespace("jmvcore", quietly=TRUE))
         stop("lexicalComparison requires jmvcore to be installed (restart may be required)")
@@ -396,7 +420,8 @@ lexicalComparison <- function(
         contribution = contribution,
         distancePlot = distancePlot,
         contributionPlot = contributionPlot,
-        angle = angle)
+        angle = angle,
+        differentialVocabularyPlot = differentialVocabularyPlot)
 
     analysis <- lexicalComparisonClass$new(
         options = options,

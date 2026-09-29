@@ -14,7 +14,8 @@ lexical(
   zipf = FALSE,
   rankFrequencyPlot = FALSE,
   lorenzPlot = FALSE,
-  frequencySpectrumPlot = FALSE
+  frequencySpectrumPlot = FALSE,
+  vocabularyConcentrationPlot = FALSE
 )
 }
 \arguments{
@@ -37,6 +38,8 @@ lexical(
 \item{lorenzPlot}{.}
 
 \item{frequencySpectrumPlot}{.}
+
+\item{vocabularyConcentrationPlot}{.}
 }
 \value{
 A results object containing:
@@ -49,6 +52,7 @@ A results object containing:
   \code{results$rankFrequencyPlot} \tab \tab \tab \tab \tab an image \cr
   \code{results$lorenzPlot} \tab \tab \tab \tab \tab an image \cr
   \code{results$frequencySpectrumPlot} \tab \tab \tab \tab \tab an image \cr
+  \code{results$vocabularyConcentrationPlot} \tab \tab \tab \tab \tab an image \cr
 }
 
 Tables can be converted to data frames with \code{asDF} or \code{\link{as.data.frame}}. For example:

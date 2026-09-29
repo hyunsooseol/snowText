@@ -250,6 +250,25 @@ items:
         - negationWindow
         - negationCues
 
+    # ============================================================
+    # Raw vs Adjusted Match Plot
+    # ============================================================
+
+    - name: negationImpactPlot
+      title: Negation Impact Plot 
+      type: Image
+      width: 650
+      height: 450
+      renderFun: .plotNegationImpact
+      visible: (negationImpactPlot)
+      clearWith:
+        - textVar
+        - lexicon
+        - normalizeKorean
+        - negationMode
+        - negationWindow
+        - negationCues
+
 
     # ============================================================
     # 7. Save to jamovi Data Set

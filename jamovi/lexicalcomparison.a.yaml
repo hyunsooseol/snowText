@@ -82,4 +82,8 @@ options:
       max: 90
       default: 0
 
+    - name: differentialVocabularyPlot
+      title: Differential Vocabulary Map
+      type: Bool
+      default: false
 ...

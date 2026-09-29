@@ -133,19 +133,39 @@ children:
       - type: LayoutBox
         margin: large
         stretchFactor: 1
+        cell:
+          column: 0
+          row: 0
+        fitToGrid: true
         children:
+          - type: Label
+            label: 'Tables'        
+            children:
+              - type: CheckBox
+                name: detectedWords
+    
+              - type: CheckBox
+                name: documentDetails
+    
+              - type: CheckBox
+                name: negationEvidence
 
-          - type: CheckBox
-            name: detectedWords
-
-          - type: CheckBox
-            name: documentDetails
-
-          - type: CheckBox
-            name: negationEvidence
-
-          - type: CheckBox
-            name: categoryPlot
+      - type: LayoutBox
+        stretchFactor: 1
+        margin: large
+        cell:
+          column: 1
+          row: 0
+        fitToGrid: true
+        children:
+          - type: Label
+            label: 'Plots'
+            children:
+              - type: CheckBox
+                name: categoryPlot
+    
+              - type: CheckBox
+                name: negationImpactPlot
             
   # ============================================================
   # Save

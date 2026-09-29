@@ -664,6 +664,100 @@ lexicalComparisonClass <- if (
           )
         }
       }
+      
+      
+      # --------------------------------------------------------
+      # Differential Vocabulary Map
+      # --------------------------------------------------------
+      
+      if (isTRUE(
+        self$options$differentialVocabularyPlot
+      )) {
+        
+        plotFrames <- list()
+        
+        
+        for (i in seq_along(pairResults)) {
+          
+          result <- pairResults[[i]]
+          
+          temp <- result$contribution
+          
+          
+          temp$absDifference <- abs(
+            temp$difference
+          )
+          
+          
+          temp <- temp[
+            order(
+              -temp$absDifference,
+              temp$word
+            ),
+            ,
+            drop = FALSE
+          ]
+          
+          
+          topN <- min(
+            10L,
+            nrow(temp)
+          )
+          
+          
+          if (topN > 0) {
+            
+            temp <- temp[
+              seq_len(topN),
+              ,
+              drop = FALSE
+            ]
+            
+            
+            temp$pair <- paste(
+              result$group1,
+              "vs",
+              result$group2
+            )
+            
+            
+            temp$direction <- ifelse(
+              temp$difference >= 0,
+              result$group1,
+              result$group2
+            )
+            
+            
+            plotFrames[[length(plotFrames) + 1L]] <-
+              temp
+          }
+        }
+        
+        
+        if (length(plotFrames) > 0) {
+          
+          plotData <- do.call(
+            rbind,
+            plotFrames
+          )
+          
+          
+          self$results$differentialVocabularyPlot$setState(
+            
+            list(
+              
+              pair = plotData$pair,
+              
+              word = plotData$word,
+              
+              difference = plotData$difference,
+              
+              direction = plotData$direction
+            )
+          )
+        }
+      }
+      
     },
     
     
@@ -1661,6 +1755,209 @@ lexicalComparisonClass <- if (
             )
           )
       }
+      
+      print(plot)
+      
+      
+      TRUE
+    },
+    
+    
+    
+    # ============================================================
+    # Differential Vocabulary Map
+    # ============================================================
+    
+    .plotDifferentialVocabulary = function(
+    image,
+    ggtheme,
+    theme,
+    ...
+    ) {
+      
+      state <- image$state
+      
+      
+      if (is.null(state))
+        return(FALSE)
+      
+      
+      if (is.null(state$pair) ||
+          is.null(state$word) ||
+          is.null(state$difference) ||
+          is.null(state$direction))
+        return(FALSE)
+      
+      
+      pair <- as.character(
+        state$pair
+      )
+      
+      
+      word <- as.character(
+        state$word
+      )
+      
+      
+      difference <- as.numeric(
+        state$difference
+      )
+      
+      
+      direction <- as.character(
+        state$direction
+      )
+      
+      
+      valid <-
+        
+        !is.na(pair) &
+        
+        !is.na(word) &
+        
+        nzchar(word) &
+        
+        is.finite(difference) &
+        
+        !is.na(direction)
+      
+      
+      pair <- pair[valid]
+      
+      word <- word[valid]
+      
+      difference <- difference[valid]
+      
+      direction <- direction[valid]
+      
+      
+      if (length(word) == 0)
+        return(FALSE)
+      
+      
+      # --------------------------------------------------------
+      # Pair-specific factor labels are used so that the
+      # ordering of words can differ across facets.
+      # --------------------------------------------------------
+      
+      uniqueLabel <- paste(
+        
+        word,
+        
+        pair,
+        
+        sep = "___"
+      )
+      
+      
+      plotData <- data.frame(
+        
+        Pair = pair,
+        
+        Word = word,
+        
+        Label = uniqueLabel,
+        
+        Difference = difference,
+        
+        Direction = direction,
+        
+        stringsAsFactors = FALSE
+      )
+      
+      
+      plotData <- plotData[
+        order(
+          plotData$Pair,
+          plotData$Difference
+        ),
+        ,
+        drop = FALSE
+      ]
+      
+      
+      plotData$Label <- factor(
+        
+        plotData$Label,
+        
+        levels = unique(
+          plotData$Label
+        )
+      )
+      
+      
+      directionLevels <- unique(
+        plotData$Direction
+      )
+      
+      
+      palette <- grDevices::hcl.colors(
+        max(
+          3,
+          length(directionLevels)
+        ),
+        palette = "Dark 3"
+      )[seq_along(directionLevels)]
+      
+      
+      plot <- ggplot2::ggplot(
+        
+        plotData,
+        
+        ggplot2::aes(
+          x = Difference,
+          y = Label,
+          fill = Direction
+        )
+        
+      ) +
+        
+        ggplot2::geom_vline(
+          xintercept = 0,
+          colour = "#7F8C8D",
+          linewidth = 0.6
+        ) +
+        
+        ggplot2::geom_col() +
+        
+        ggplot2::scale_x_continuous(
+          breaks = function(x) pretty(x, n = 3),
+          labels = function(x) sprintf("%.1f", x * 100)
+        ) +
+        
+        ggplot2::scale_fill_manual(
+          values = stats::setNames(
+            palette,
+            directionLevels
+          )
+        ) +
+        
+        ggplot2::facet_wrap(
+          ~ Pair,
+          scales = "free_y"
+        ) +
+        
+        ggplot2::scale_y_discrete(
+          
+          labels = function(x) {
+            
+            sub(
+              "___.*$",
+              "",
+              x
+            )
+          }
+        ) +
+        
+        ggplot2::labs(
+          x = "Relative Frequency Difference (%)",
+          y = "Word",
+          fill = "Higher in"
+        )
+      
+      
+      plot <- plot + ggtheme
+      
       
       print(plot)
       

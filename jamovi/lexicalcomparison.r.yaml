@@ -210,4 +210,19 @@ items:
         - group
         - angle
 
+    # ============================================================
+    # 7. Differential Vocabulary Map
+    # ============================================================
+
+    - name: differentialVocabularyPlot
+      title: Differential Vocabulary Map
+      type: Image
+      width: 650
+      height: 450
+      renderFun: .plotDifferentialVocabulary
+      visible: (differentialVocabularyPlot)
+      clearWith:
+        - words
+        - freq
+        - group
 ...

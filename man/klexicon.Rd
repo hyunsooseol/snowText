@@ -19,7 +19,8 @@ klexicon(
   detectedWords = FALSE,
   documentDetails = FALSE,
   negationEvidence = FALSE,
-  categoryPlot = FALSE
+  categoryPlot = FALSE,
+  negationImpactPlot = FALSE
 )
 }
 \arguments{
@@ -48,6 +49,8 @@ trailing * indicates prefix matching.}
 \item{negationEvidence}{.}
 
 \item{categoryPlot}{.}
+
+\item{negationImpactPlot}{.}
 }
 \value{
 A results object containing:
@@ -60,6 +63,7 @@ A results object containing:
   \code{results$negationEvidence} \tab \tab \tab \tab \tab a table \cr
   \code{results$statusNote} \tab \tab \tab \tab \tab a preformatted \cr
   \code{results$categoryPlot} \tab \tab \tab \tab \tab an image \cr
+  \code{results$negationImpactPlot} \tab \tab \tab \tab \tab an image \cr
   \code{results$saveResults} \tab \tab \tab \tab \tab an output \cr
 }
 

@@ -150,4 +150,9 @@ options:
       title: Category Match Plot
       type: Bool
       default: false
+
+    - name: negationImpactPlot
+      title: Raw vs Adjusted Match Plot
+      type: Bool
+      default: false      
 ...

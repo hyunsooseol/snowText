@@ -430,6 +430,66 @@ lexicalClass <- if (requireNamespace('jmvcore', quietly = TRUE)) R6::R6Class(
           )
         )
       }
+      
+      
+      # --------------------------------------------------------
+      # Vocabulary Concentration Map
+      # --------------------------------------------------------
+      
+      if (isTRUE(self$options$vocabularyConcentrationPlot)) {
+        
+        freq <- sort(
+          dat$frequency,
+          decreasing = TRUE
+        )
+        
+        vocabularySize <- length(freq)
+        totalFrequency <- sum(freq)
+        
+        if (vocabularySize > 0 &&
+            is.finite(totalFrequency) &&
+            totalFrequency > 0) {
+          
+          cumulativeFrequency <- cumsum(freq) / totalFrequency
+          
+          targetShares <- c(
+            0.01,
+            0.05,
+            0.10,
+            0.20,
+            0.50,
+            1.00
+          )
+          
+          topCounts <- pmax(
+            1L,
+            ceiling(vocabularySize * targetShares)
+          )
+          
+          topCounts <- pmin(
+            vocabularySize,
+            topCounts
+          )
+          
+          coverage <- vapply(
+            topCounts,
+            function(n) {
+              cumulativeFrequency[n]
+            },
+            numeric(1)
+          )
+          
+          actualShares <- topCounts / vocabularySize
+          
+          self$results$vocabularyConcentrationPlot$setState(
+            list(
+              vocabularyShare = actualShares * 100,
+              frequencyShare = coverage * 100
+            )
+          )
+        }
+      }
+      
     },
     
     
@@ -1008,8 +1068,113 @@ lexicalClass <- if (requireNamespace('jmvcore', quietly = TRUE)) R6::R6Class(
       print(plot)
       
       TRUE
-    }
+    },
     
+    
+    
+    
+    # ============================================================
+    # Vocabulary Concentration Map
+    # ============================================================
+    
+    .plotVocabularyConcentration = function(
+    image,
+    ggtheme,
+    theme,
+    ...
+    ) {
+      
+      state <- image$state
+      
+      if (is.null(state))
+        return(FALSE)
+      
+      if (is.null(state$vocabularyShare) ||
+          is.null(state$frequencyShare))
+        return(FALSE)
+      
+      vocabularyShare <- as.numeric(
+        state$vocabularyShare
+      )
+      
+      frequencyShare <- as.numeric(
+        state$frequencyShare
+      )
+      
+      valid <- is.finite(vocabularyShare) &
+        is.finite(frequencyShare)
+      
+      vocabularyShare <- vocabularyShare[valid]
+      frequencyShare <- frequencyShare[valid]
+      
+      if (length(vocabularyShare) == 0)
+        return(FALSE)
+      
+      plotData <- data.frame(
+        VocabularyShare = vocabularyShare,
+        FrequencyShare = frequencyShare
+      )
+      
+      plot <- ggplot2::ggplot(
+        plotData,
+        ggplot2::aes(
+          x = VocabularyShare,
+          y = FrequencyShare
+        )
+      ) +
+        ggplot2::geom_line(
+          linewidth = 1.0,
+          colour = "#2F80ED"
+        ) +
+        ggplot2::geom_point(
+          size = 2.8,
+          colour = "#2F80ED"
+        ) +
+        ggplot2::geom_text(
+          ggplot2::aes(
+            label = sprintf(
+              "%.1f%%",
+              FrequencyShare
+            )
+          ),
+          vjust = -0.8,
+          size = 3.3,
+          colour = "#333333"
+        ) +
+        ggplot2::scale_x_continuous(
+          breaks = vocabularyShare,
+          labels = function(x) {
+            sprintf("%.0f%%", x)
+          },
+          limits = c(
+            0,
+            100
+          )
+        ) +
+        ggplot2::scale_y_continuous(
+          breaks = seq(
+            0,
+            100,
+            by = 20
+          ),
+          labels = function(x) {
+            sprintf("%.0f%%", x)
+          },
+          limits = c(
+            0,
+            105
+          )
+        ) +
+        ggplot2::labs(
+          x = "Top Vocabulary Share",
+          y = "Cumulative Frequency Share"
+        ) +
+        ggtheme
+      
+      print(plot)
+      
+      TRUE
+    }
     
   )
 )

@@ -14,7 +14,8 @@ lexicalOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
             zipf = FALSE,
             rankFrequencyPlot = FALSE,
             lorenzPlot = FALSE,
-            frequencySpectrumPlot = FALSE, ...) {
+            frequencySpectrumPlot = FALSE,
+            vocabularyConcentrationPlot = FALSE, ...) {
 
             super$initialize(
                 package="snowText",
@@ -64,6 +65,10 @@ lexicalOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                 "frequencySpectrumPlot",
                 frequencySpectrumPlot,
                 default=FALSE)
+            private$..vocabularyConcentrationPlot <- jmvcore::OptionBool$new(
+                "vocabularyConcentrationPlot",
+                vocabularyConcentrationPlot,
+                default=FALSE)
 
             self$.addOption(private$..words)
             self$.addOption(private$..freq)
@@ -74,6 +79,7 @@ lexicalOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
             self$.addOption(private$..rankFrequencyPlot)
             self$.addOption(private$..lorenzPlot)
             self$.addOption(private$..frequencySpectrumPlot)
+            self$.addOption(private$..vocabularyConcentrationPlot)
         }),
     active = list(
         words = function() private$..words$value,
@@ -84,7 +90,8 @@ lexicalOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
         zipf = function() private$..zipf$value,
         rankFrequencyPlot = function() private$..rankFrequencyPlot$value,
         lorenzPlot = function() private$..lorenzPlot$value,
-        frequencySpectrumPlot = function() private$..frequencySpectrumPlot$value),
+        frequencySpectrumPlot = function() private$..frequencySpectrumPlot$value,
+        vocabularyConcentrationPlot = function() private$..vocabularyConcentrationPlot$value),
     private = list(
         ..words = NA,
         ..freq = NA,
@@ -94,7 +101,8 @@ lexicalOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
         ..zipf = NA,
         ..rankFrequencyPlot = NA,
         ..lorenzPlot = NA,
-        ..frequencySpectrumPlot = NA)
+        ..frequencySpectrumPlot = NA,
+        ..vocabularyConcentrationPlot = NA)
 )
 
 lexicalResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
@@ -108,7 +116,8 @@ lexicalResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
         zipf = function() private$.items[["zipf"]],
         rankFrequencyPlot = function() private$.items[["rankFrequencyPlot"]],
         lorenzPlot = function() private$.items[["lorenzPlot"]],
-        frequencySpectrumPlot = function() private$.items[["frequencySpectrumPlot"]]),
+        frequencySpectrumPlot = function() private$.items[["frequencySpectrumPlot"]],
+        vocabularyConcentrationPlot = function() private$.items[["vocabularyConcentrationPlot"]]),
     private = list(),
     public=list(
         initialize=function(options) {
@@ -266,6 +275,17 @@ lexicalResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                 visible="(frequencySpectrumPlot)",
                 clearWith=list(
                     "words",
+                    "freq")))
+            self$add(jmvcore::Image$new(
+                options=options,
+                name="vocabularyConcentrationPlot",
+                title="Vocabulary Concentration Map",
+                width=650,
+                height=450,
+                renderFun=".plotVocabularyConcentration",
+                visible="(vocabularyConcentrationPlot)",
+                clearWith=list(
+                    "words",
                     "freq")))}))
 
 lexicalBase <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
@@ -302,6 +322,7 @@ lexicalBase <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
 #' @param rankFrequencyPlot .
 #' @param lorenzPlot .
 #' @param frequencySpectrumPlot .
+#' @param vocabularyConcentrationPlot .
 #' @return A results object containing:
 #' \tabular{llllll}{
 #'   \code{results$instructions} \tab \tab \tab \tab \tab a html \cr
@@ -312,6 +333,7 @@ lexicalBase <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
 #'   \code{results$rankFrequencyPlot} \tab \tab \tab \tab \tab an image \cr
 #'   \code{results$lorenzPlot} \tab \tab \tab \tab \tab an image \cr
 #'   \code{results$frequencySpectrumPlot} \tab \tab \tab \tab \tab an image \cr
+#'   \code{results$vocabularyConcentrationPlot} \tab \tab \tab \tab \tab an image \cr
 #' }
 #'
 #' Tables can be converted to data frames with \code{asDF} or \code{\link{as.data.frame}}. For example:
@@ -331,7 +353,8 @@ lexical <- function(
     zipf = FALSE,
     rankFrequencyPlot = FALSE,
     lorenzPlot = FALSE,
-    frequencySpectrumPlot = FALSE) {
+    frequencySpectrumPlot = FALSE,
+    vocabularyConcentrationPlot = FALSE) {
 
     if ( ! requireNamespace("jmvcore", quietly=TRUE))
         stop("lexical requires jmvcore to be installed (restart may be required)")
@@ -355,7 +378,8 @@ lexical <- function(
         zipf = zipf,
         rankFrequencyPlot = rankFrequencyPlot,
         lorenzPlot = lorenzPlot,
-        frequencySpectrumPlot = frequencySpectrumPlot)
+        frequencySpectrumPlot = frequencySpectrumPlot,
+        vocabularyConcentrationPlot = vocabularyConcentrationPlot)
 
     analysis <- lexicalClass$new(
         options = options,

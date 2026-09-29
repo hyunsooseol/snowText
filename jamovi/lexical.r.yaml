@@ -191,6 +191,20 @@ items:
         - words
         - freq
 
+    # ============================================================
+    # 8. Vocabulary Concentration Map
+    # ============================================================
+
+    - name: vocabularyConcentrationPlot
+      title: Vocabulary Concentration Map
+      type: Image
+      width: 650
+      height: 450
+      renderFun: .plotVocabularyConcentration
+      visible: (vocabularyConcentrationPlot)
+      clearWith:
+        - words
+        - freq
 ...
 
 

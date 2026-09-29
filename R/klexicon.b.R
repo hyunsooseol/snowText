@@ -1382,6 +1382,38 @@ klexiconClass <- if (requireNamespace(
         )
       }
       
+      # ----------------------------------------------------
+      # Raw vs Adjusted Match Plot
+      # ----------------------------------------------------
+      
+      if (isTRUE(self$options$negationImpactPlot)) {
+        
+        raw_totals <- vapply(
+          seq_along(dict$categories),
+          function(cat_i) {
+            sn <- safe_names[cat_i]
+            sum(raw_counts[[sn]])
+          },
+          numeric(1)
+        )
+        
+        adjusted_totals <- vapply(
+          seq_along(dict$categories),
+          function(cat_i) {
+            sn <- safe_names[cat_i]
+            sum(adjusted_counts[[sn]])
+          },
+          numeric(1)
+        )
+        
+        self$results$negationImpactPlot$setState(
+          list(
+            categories = dict$categories,
+            rawMatches = raw_totals,
+            adjustedMatches = adjusted_totals
+          )
+        )
+      }      
       
       # ----------------------------------------------------
       # Notes
@@ -1853,6 +1885,139 @@ klexiconClass <- if (requireNamespace(
         )
       
       print(plot)
+      TRUE
+    },
+    
+    # ================================================================
+    # Raw vs Adjusted Match Plot
+    # ================================================================
+    
+    .plotNegationImpact = function(
+    image,
+    ggtheme,
+    theme,
+    ...
+    ) {
+      
+      state <- image$state
+      
+      if (is.null(state) ||
+          is.null(state$categories) ||
+          is.null(state$rawMatches) ||
+          is.null(state$adjustedMatches))
+        return(FALSE)
+      
+      categories <- as.character(
+        state$categories
+      )
+      
+      rawMatches <- as.numeric(
+        state$rawMatches
+      )
+      
+      adjustedMatches <- as.numeric(
+        state$adjustedMatches
+      )
+      
+      if (length(categories) == 0L ||
+          length(categories) != length(rawMatches) ||
+          length(categories) != length(adjustedMatches))
+        return(FALSE)
+      
+      valid <- is.finite(rawMatches) &
+        is.finite(adjustedMatches)
+      
+      categories <- categories[valid]
+      rawMatches <- rawMatches[valid]
+      adjustedMatches <- adjustedMatches[valid]
+      
+      if (length(categories) == 0L)
+        return(FALSE)
+      
+      plotData <- data.frame(
+        Category = rep(
+          categories,
+          each = 2
+        ),
+        MatchType = factor(
+          rep(
+            c(
+              "Raw",
+              "Adjusted"
+            ),
+            times = length(categories)
+          ),
+          levels = c(
+            "Raw",
+            "Adjusted"
+          )
+        ),
+        Matches = as.numeric(
+          rbind(
+            rawMatches,
+            adjustedMatches
+          )
+        ),
+        stringsAsFactors = FALSE
+      )
+      
+      plotData$Category <- factor(
+        plotData$Category,
+        levels = rev(categories)
+      )
+      
+      plot <- ggplot2::ggplot(
+        plotData,
+        ggplot2::aes(
+          x = Category,
+          y = Matches,
+          fill = MatchType
+        )
+      ) +
+        ggplot2::geom_col(
+          position = ggplot2::position_dodge(
+            width = 0.78
+          ),
+          width = 0.68
+        ) +
+        ggplot2::geom_text(
+          ggplot2::aes(
+            label = Matches
+          ),
+          position = ggplot2::position_dodge(
+            width = 0.78
+          ),
+          hjust = -0.15,
+          size = 3.4
+        ) +
+        ggplot2::scale_fill_manual(
+          values = c(
+            "Raw" = "#7F8C8D",
+            "Adjusted" = "#2F80ED"
+          )
+        ) +
+        ggplot2::scale_y_continuous(
+          expand = ggplot2::expansion(
+            mult = c(0, 0.15)
+          )
+        ) +
+        ggplot2::coord_flip(
+          clip = "off"
+        ) +
+        ggplot2::labs(
+          x = NULL,
+          y = "Matches",
+          fill = NULL
+        ) +
+        ggtheme +
+        ggplot2::theme(
+          legend.position = "right",
+          panel.grid.major.y =
+            ggplot2::element_blank()
+        )
+      
+      print(plot)
+      
       TRUE
     }
   )
