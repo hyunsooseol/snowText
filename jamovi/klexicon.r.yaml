@@ -276,7 +276,20 @@ items:
     # ============================================================
 
     - name: saveResults
-      title: Append results to the data set
+      title: 'Analysis scores'
+      type: Output
+      initInRun: true
+      clearWith:
+        - textVar
+        - lexicon
+        - normalizeKorean
+        - negationMode
+        - negationWindow
+        - negationCues
+        - detectedWords
+
+    - name: detectedWords
+      title: 'Detected terms'
       type: Output
       initInRun: true
       clearWith:

@@ -1587,15 +1587,10 @@ klexiconClass <- if (requireNamespace(
       
       
       # ----------------------------------------------------
-      # Save results to jamovi data set
+      # Save numeric results to jamovi data set
       # ----------------------------------------------------
       
-      if (isTRUE(
-        self$options$saveResults
-      ) &&
-      self$results$saveResults$
-      isNotFilled()) {
-        
+      if (isTRUE(self$options$saveResults)) {
         
         output <- data.frame(
           n_tokens = n_tokens,
@@ -1603,63 +1598,22 @@ klexiconClass <- if (requireNamespace(
           stringsAsFactors = FALSE
         )
         
-        
-        for (cat_i in seq_along(
-          dict$categories
-        )) {
+        for (cat_i in seq_along(dict$categories)) {
           
           sn <- safe_names[cat_i]
           
-          output[[
-            paste0(
-              sn,
-              "_raw_count"
-            )
-          ]] <- raw_counts[[sn]]
-          
-          output[[
-            paste0(
-              sn,
-              "_negated_count"
-            )
-          ]] <- neg_counts[[sn]]
-          
-          output[[
-            paste0(
-              sn,
-              "_adjusted_count"
-            )
-          ]] <- adjusted_counts[[sn]]
-          
-          output[[
-            paste0(
-              sn,
-              "_adjusted_prop"
-            )
-          ]] <- percentages[[sn]]
-          
-          if (isTRUE(
-            self$options$detectedWords
-          )) {
-            
-            output[[
-              paste0(
-                sn,
-                "_detected_terms"
-              )
-            ]] <-
-              detected_terms[[sn]]
-          }
+          output[[paste0(sn, "_raw_count")]] <- raw_counts[[sn]]
+          output[[paste0(sn, "_negated_count")]] <- neg_counts[[sn]]
+          output[[paste0(sn, "_adjusted_count")]] <- adjusted_counts[[sn]]
+          output[[paste0(sn, "_adjusted_prop")]] <- percentages[[sn]]
         }
         
-        
-        keys <- names(output)
-        titles <- keys
-        
+        keys <- seq_len(ncol(output))
+        titles <- names(output)
         
         descriptions <- vapply(
           
-          keys,
+          titles,
           
           function(k) {
             
@@ -1724,7 +1678,7 @@ klexiconClass <- if (requireNamespace(
             }
             
             if (grepl(
-              "_adjusted_perc$",
+              "_adjusted_prop$",
               k
             )) {
               
@@ -1736,20 +1690,6 @@ klexiconClass <- if (requireNamespace(
               )
             }
             
-            if (grepl(
-              "_detected_terms$",
-              k
-            )) {
-              
-              return(
-                paste0(
-                  "Comma-separated surface ",
-                  "forms matched for the ",
-                  "dictionary category"
-                )
-              )
-            }
-            
             "Korean Lexicon Analysis result"
           },
           
@@ -1757,39 +1697,58 @@ klexiconClass <- if (requireNamespace(
         )
         
         
-        measure_types <- ifelse(
-          
-          grepl(
-            "_detected_terms$",
-            keys
-          ),
-          
-          "nominal",
-          "continuous"
-        )
-        
-        
         self$results$saveResults$set(
-          keys,
-          titles,
-          descriptions,
-          measure_types
+          keys = keys,
+          titles = titles,
+          descriptions = descriptions,
+          measureTypes = rep("continuous", length(keys))
         )
         
+        self$results$saveResults$setRowNums(
+          rownames(self$data)
+        )
         
-        self$results$saveResults$
-          setRowNums(
-            rownames(self$data)
+        for (i in keys) {
+          self$results$saveResults$setValues(
+            values = output[[i]],
+            index = i
           )
+        }
+      }
+      
+      
+      # ----------------------------------------------------
+      # Save detected terms independently to jamovi data set
+      # ----------------------------------------------------
+      
+      if (isTRUE(self$options$detectedWords)) {
         
+        keys <- seq_along(dict$categories)
+        titles <- paste0(safe_names, "_detected_terms")
+        descriptions <- rep(
+          paste0(
+            "Comma-separated surface forms matched ",
+            "for the dictionary category"
+          ),
+          length(keys)
+        )
         
-        for (k in keys) {
-          
-          self$results$saveResults$
-            setValues(
-              output[[k]],
-              key = k
-            )
+        self$results$detectedWords$set(
+          keys = keys,
+          titles = titles,
+          descriptions = descriptions,
+          measureTypes = rep("nominal", length(keys))
+        )
+        
+        self$results$detectedWords$setRowNums(
+          rownames(self$data)
+        )
+        
+        for (i in keys) {
+          self$results$detectedWords$setValues(
+            values = factor(detected_terms[[safe_names[i]]]),
+            index = i
+          )
         }
       }
       

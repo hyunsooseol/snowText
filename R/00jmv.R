@@ -7,5 +7,5 @@
         `author`="Seol, H.", 
         `year`=2026, 
         `title`="snowText: Text Mining Analysis", 
-        `publisher`="(Version 1.0.0) [jamovi module]. URL https://github.com/hyunsooseol/snowText", 
+        `publisher`="(Version 1.0.1) [jamovi module]. URL https://github.com/hyunsooseol/snowText", 
         `url`="https://github.com/hyunsooseol/snowText"))

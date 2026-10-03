@@ -16,7 +16,6 @@ klexiconOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
             negationMode = "exclude",
             negationWindow = 1,
             negationCues = "\uC54A*, \uBABB*, \uC548",
-            detectedWords = FALSE,
             documentDetails = FALSE,
             negationEvidence = FALSE,
             categoryPlot = FALSE,
@@ -76,10 +75,6 @@ klexiconOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                 "negationCues",
                 negationCues,
                 default="\uC54A*, \uBABB*, \uC548")
-            private$..detectedWords <- jmvcore::OptionBool$new(
-                "detectedWords",
-                detectedWords,
-                default=FALSE)
             private$..documentDetails <- jmvcore::OptionBool$new(
                 "documentDetails",
                 documentDetails,
@@ -90,6 +85,8 @@ klexiconOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                 default=FALSE)
             private$..saveResults <- jmvcore::OptionOutput$new(
                 "saveResults")
+            private$..detectedWords <- jmvcore::OptionOutput$new(
+                "detectedWords")
             private$..categoryPlot <- jmvcore::OptionBool$new(
                 "categoryPlot",
                 categoryPlot,
@@ -105,10 +102,10 @@ klexiconOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
             self$.addOption(private$..negationMode)
             self$.addOption(private$..negationWindow)
             self$.addOption(private$..negationCues)
-            self$.addOption(private$..detectedWords)
             self$.addOption(private$..documentDetails)
             self$.addOption(private$..negationEvidence)
             self$.addOption(private$..saveResults)
+            self$.addOption(private$..detectedWords)
             self$.addOption(private$..categoryPlot)
             self$.addOption(private$..negationImpactPlot)
         }),
@@ -119,10 +116,10 @@ klexiconOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
         negationMode = function() private$..negationMode$value,
         negationWindow = function() private$..negationWindow$value,
         negationCues = function() private$..negationCues$value,
-        detectedWords = function() private$..detectedWords$value,
         documentDetails = function() private$..documentDetails$value,
         negationEvidence = function() private$..negationEvidence$value,
         saveResults = function() private$..saveResults$value,
+        detectedWords = function() private$..detectedWords$value,
         categoryPlot = function() private$..categoryPlot$value,
         negationImpactPlot = function() private$..negationImpactPlot$value),
     private = list(
@@ -132,10 +129,10 @@ klexiconOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
         ..negationMode = NA,
         ..negationWindow = NA,
         ..negationCues = NA,
-        ..detectedWords = NA,
         ..documentDetails = NA,
         ..negationEvidence = NA,
         ..saveResults = NA,
+        ..detectedWords = NA,
         ..categoryPlot = NA,
         ..negationImpactPlot = NA)
 )
@@ -153,7 +150,8 @@ klexiconResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
         statusNote = function() private$.items[["statusNote"]],
         categoryPlot = function() private$.items[["categoryPlot"]],
         negationImpactPlot = function() private$.items[["negationImpactPlot"]],
-        saveResults = function() private$.items[["saveResults"]]),
+        saveResults = function() private$.items[["saveResults"]],
+        detectedWords = function() private$.items[["detectedWords"]]),
     private = list(),
     public=list(
         initialize=function(options) {
@@ -382,7 +380,20 @@ klexiconResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
             self$add(jmvcore::Output$new(
                 options=options,
                 name="saveResults",
-                title="Append results to the data set",
+                title="Analysis scores",
+                initInRun=TRUE,
+                clearWith=list(
+                    "textVar",
+                    "lexicon",
+                    "normalizeKorean",
+                    "negationMode",
+                    "negationWindow",
+                    "negationCues",
+                    "detectedWords")))
+            self$add(jmvcore::Output$new(
+                options=options,
+                name="detectedWords",
+                title="Detected terms",
                 initInRun=TRUE,
                 clearWith=list(
                     "textVar",
@@ -431,7 +442,6 @@ klexiconBase <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
 #' @param negationWindow .
 #' @param negationCues Enter Korean negation cues as a comma-separated list. A
 #'   trailing * indicates prefix matching.
-#' @param detectedWords .
 #' @param documentDetails .
 #' @param negationEvidence .
 #' @param categoryPlot .
@@ -448,6 +458,7 @@ klexiconBase <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
 #'   \code{results$categoryPlot} \tab \tab \tab \tab \tab an image \cr
 #'   \code{results$negationImpactPlot} \tab \tab \tab \tab \tab an image \cr
 #'   \code{results$saveResults} \tab \tab \tab \tab \tab an output \cr
+#'   \code{results$detectedWords} \tab \tab \tab \tab \tab an output \cr
 #' }
 #'
 #' Tables can be converted to data frames with \code{asDF} or \code{\link{as.data.frame}}. For example:
@@ -469,7 +480,6 @@ klexicon <- function(
     negationMode = "exclude",
     negationWindow = 1,
     negationCues = "\uC54A*, \uBABB*, \uC548",
-    detectedWords = FALSE,
     documentDetails = FALSE,
     negationEvidence = FALSE,
     categoryPlot = FALSE,
@@ -492,7 +502,6 @@ klexicon <- function(
         negationMode = negationMode,
         negationWindow = negationWindow,
         negationCues = negationCues,
-        detectedWords = detectedWords,
         documentDetails = documentDetails,
         negationEvidence = negationEvidence,
         categoryPlot = categoryPlot,

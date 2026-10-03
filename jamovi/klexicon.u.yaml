@@ -142,9 +142,6 @@ children:
             label: 'Tables'        
             children:
               - type: CheckBox
-                name: detectedWords
-    
-              - type: CheckBox
                 name: documentDetails
     
               - type: CheckBox
@@ -176,7 +173,8 @@ children:
     collapsed: true
     stretchFactor: 1
     children:
-
       - type: Output
         name: saveResults
+      - type: Output
+        name: detectedWords
 

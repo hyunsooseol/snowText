@@ -1,12 +1,12 @@
 ---
 title: Text Mining Analysis
 name: snowText
-version: 1.0.0
+version: 1.0.1
 jms: '1.0'
 authors:
   - Hyunsoo Seol
 maintainer: The package maintainer <yourself@somewhere.net>
-date: '2026-09-27'
+date: '2026-10-03'
 type: R
 description: >-
   This module provides research-oriented diagnostic statistics for text

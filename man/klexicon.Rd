@@ -16,7 +16,6 @@ klexicon(
   negationMode = "exclude",
   negationWindow = 1,
   negationCues = "않*, 못*, 안",
-  detectedWords = FALSE,
   documentDetails = FALSE,
   negationEvidence = FALSE,
   categoryPlot = FALSE,
@@ -42,8 +41,6 @@ allowed.}
 \item{negationCues}{Enter Korean negation cues as a comma-separated list. A
 trailing * indicates prefix matching.}
 
-\item{detectedWords}{.}
-
 \item{documentDetails}{.}
 
 \item{negationEvidence}{.}
@@ -65,6 +62,7 @@ A results object containing:
   \code{results$categoryPlot} \tab \tab \tab \tab \tab an image \cr
   \code{results$negationImpactPlot} \tab \tab \tab \tab \tab an image \cr
   \code{results$saveResults} \tab \tab \tab \tab \tab an output \cr
+  \code{results$detectedWords} \tab \tab \tab \tab \tab an output \cr
 }
 
 Tables can be converted to data frames with \code{asDF} or \code{\link{as.data.frame}}. For example:

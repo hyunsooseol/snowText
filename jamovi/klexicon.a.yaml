@@ -122,11 +122,6 @@ options:
     # Result Options
     # ============================================================
 
-    - name: detectedWords
-      title: Detected terms
-      type: Bool
-      default: false
-
     - name: documentDetails
       title: Matching document details
       type: Bool
@@ -143,7 +138,11 @@ options:
     # ============================================================
 
     - name: saveResults
-      title: Append results to the data set
+      title: 'Analysis scores'
+      type: Output
+
+    - name: detectedWords
+      title: 'Detected terms'
       type: Output
 
     - name: categoryPlot
@@ -152,7 +151,7 @@ options:
       default: false
 
     - name: negationImpactPlot
-      title: Raw vs Adjusted Match Plot
+      title: Negation Impact Plot 
       type: Bool
       default: false      
 ...
