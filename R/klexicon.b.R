@@ -850,6 +850,24 @@ klexiconClass <- if (requireNamespace(
             'the jamovi data set for subsequent statistical ',
             'analysis.</li>',
             
+            '<li><strong>Category Co-occurrence / Heatmap</strong>: ',
+            'counts documents with at least one adjusted match ',
+            'in both categories. Each document is counted once ',
+            'per category pair, regardless of repeated matches. ',
+            'Heatmap numbers indicate document counts; darker ',
+            'cells indicate more documents. The matrix is ',
+            'symmetric, and diagonal cells are omitted because ',
+            'they represent the same category. Table percentages ',
+            'use all analysed documents as the denominator, ',
+            'including documents without matches.</li>',
+            
+            '<li><strong>Category Prevalence Plot</strong>: ',
+            'the horizontal axis shows the percentage of all ',
+            'analysed documents with at least one adjusted match ',
+            'in each category, including documents without matches ',
+            'in the denominator. A document may belong to multiple ',
+            'categories, so the percentages need not sum to 100%.</li>',
+            
             '</ul>',
             
             '<p><strong>Important:</strong> dictionary results ',
@@ -857,6 +875,10 @@ klexiconClass <- if (requireNamespace(
             'terms. The supplied categories are examples and ',
             'should not be interpreted as a validated ',
             'psychological lexicon.</p>',
+            
+            '<p>Feature requests and bug reports:',
+            '<a href="https://github.com/hyunsooseol/snowText/issues"',
+            'target="_blank">GitHub</a>.</p>',
             
             '</div></div>'
           )
@@ -902,6 +924,15 @@ klexiconClass <- if (requireNamespace(
     # ========================================================
     
     .run = function() {
+      
+      # Initialize only the new optional results before early returns.
+      self$results$cooccurrence$deleteRows()
+      self$results$cooccurrence$setNote(
+        "basis",
+        "Select a text variable to calculate document-level co-occurrence."
+      )
+      self$results$cooccurrencePlot$setState(list(valid = FALSE))
+      self$results$prevalencePlot$setState(list(valid = FALSE))
       
       # ----------------------------------------------------
       # Dictionary
@@ -1363,6 +1394,96 @@ klexiconClass <- if (requireNamespace(
       
       
       # ----------------------------------------------------
+      # Document-level category co-occurrence and prevalence
+      # ----------------------------------------------------
+      
+      if (isTRUE(self$options$cooccurrence) ||
+          isTRUE(self$options$cooccurrencePlot) ||
+          isTRUE(self$options$prevalencePlot)) {
+        
+        n_categories <- length(dict$categories)
+        
+        # Keep a document x category matrix even with one document/category.
+        presence <- matrix(
+          vapply(
+            safe_names,
+            function(sn) adjusted_counts[[sn]] > 0L,
+            logical(n_docs)
+          ),
+          nrow = n_docs,
+          ncol = n_categories
+        )
+        
+        document_counts <- colSums(presence)
+        document_percentages <- 100 * document_counts / n_docs
+        
+        if (isTRUE(self$options$cooccurrence) ||
+            isTRUE(self$options$cooccurrencePlot)) {
+          
+          # Each document contributes at most one to a category pair.
+          joint_counts <- crossprod(presence * 1L)
+          
+          if (isTRUE(self$options$cooccurrence)) {
+            
+            cooccurrence_table <- self$results$cooccurrence
+            cooccurrence_table$setNote(
+              "basis",
+              paste0(
+                "Both categories must have at least one adjusted match ",
+                "in the same document. Each document is counted once ",
+                "per pair. Percentages use all ", n_docs,
+                " analysed documents, including documents without matches. ",
+                if (n_categories < 2L)
+                  "At least two categories are required. "
+                else "",
+                "Co-occurrence does not imply causation or statistical significance."
+              )
+            )
+            
+            if (n_categories >= 2L) {
+              for (i in seq_len(n_categories - 1L)) {
+                for (j in seq.int(i + 1L, n_categories)) {
+                  cooccurrence_table$addRow(
+                    rowKey = paste(i, j, sep = "_"),
+                    values = list(
+                      category1 = dict$categories[i],
+                      category2 = dict$categories[j],
+                      docCount = joint_counts[i, j],
+                      docPerc = 100 * joint_counts[i, j] / n_docs
+                    )
+                  )
+                }
+              }
+            }
+          }
+          
+          if (isTRUE(self$options$cooccurrencePlot)) {
+            self$results$cooccurrencePlot$setState(
+              list(
+                valid = TRUE,
+                categories = dict$categories,
+                counts = joint_counts,
+                nDocs = n_docs
+              )
+            )
+          }
+        }
+        
+        if (isTRUE(self$options$prevalencePlot)) {
+          self$results$prevalencePlot$setState(
+            list(
+              valid = TRUE,
+              categories = dict$categories,
+              documentCounts = document_counts,
+              percentages = document_percentages,
+              nDocs = n_docs
+            )
+          )
+        }
+      }
+      
+      
+      # ----------------------------------------------------
       # Category Match Plot
       # ----------------------------------------------------
       
@@ -1753,6 +1874,155 @@ klexiconClass <- if (requireNamespace(
       }
       
       
+      TRUE
+    },
+    
+    
+    # ================================================================
+    # Category Co-occurrence Heatmap
+    # ================================================================
+    
+    .plotCategoryCooccurrence = function(image, ggtheme, theme, ...) {
+      
+      state <- image$state
+      if (is.null(state) || !isTRUE(state$valid))
+        return(FALSE)
+      
+      categories <- as.character(state$categories)
+      n_categories <- length(categories)
+      counts <- state$counts
+      
+      if (n_categories == 0L || !is.matrix(counts) ||
+          !identical(dim(counts), c(n_categories, n_categories)))
+        return(FALSE)
+      
+      if (n_categories < 2L) {
+        plot <- ggplot2::ggplot() +
+          ggplot2::annotate(
+            "text", x = 0, y = 0,
+            label = "At least two categories are required.", size = 4
+          ) +
+          ggtheme +
+          ggplot2::theme(
+            axis.title = ggplot2::element_blank(),
+            axis.text = ggplot2::element_blank(),
+            axis.ticks = ggplot2::element_blank(),
+            panel.grid = ggplot2::element_blank()
+          )
+        print(plot)
+        return(TRUE)
+      }
+      
+      plot_data <- expand.grid(
+        row = seq_len(n_categories),
+        column = seq_len(n_categories)
+      )
+      plot_data$Count <- as.numeric(counts)
+      diagonal <- plot_data$row == plot_data$column
+      plot_data$Count[diagonal] <- NA_real_
+      max_count <- max(plot_data$Count, na.rm = TRUE)
+      plot_data$Label <- ifelse(diagonal, "", as.character(plot_data$Count))
+      plot_data$TextColor <- ifelse(
+        !diagonal & max_count > 0 & plot_data$Count >= 0.6 * max_count,
+        "white", "#263238"
+      )
+      plot_data$TextColor[diagonal] <- "#263238"
+      plot_data$CategoryX <- factor(
+        categories[plot_data$column], levels = categories
+      )
+      plot_data$CategoryY <- factor(
+        categories[plot_data$row], levels = rev(categories)
+      )
+      
+      plot <- ggplot2::ggplot(
+        plot_data,
+        ggplot2::aes(x = CategoryX, y = CategoryY, fill = Count)
+      ) +
+        ggplot2::geom_tile(colour = "#DDE3EA", linewidth = 0.4) +
+        ggplot2::geom_text(
+          ggplot2::aes(label = Label, colour = TextColor),
+          size = max(2, min(3.8, 16 / n_categories)),
+          show.legend = FALSE
+        ) +
+        ggtheme +
+        ggplot2::scale_colour_identity() +
+        ggplot2::scale_fill_gradient(
+          low = "#EDF4FB", high = "#2166AC",
+          limits = c(0, max(1, max_count)),
+          breaks = unique(round(pretty(c(0, max(1, max_count)), n = 4))),
+          na.value = "transparent",
+          name = "Docs with both"
+        ) +
+        ggplot2::coord_fixed() +
+        ggplot2::labs(
+          x = NULL, y = NULL
+        ) +
+        ggplot2::theme(
+          panel.grid = ggplot2::element_blank(),
+          axis.text.x = ggplot2::element_text(angle = 45, hjust = 1),
+          legend.position = "right"
+        )
+      
+      print(plot)
+      TRUE
+    },
+    
+    
+    # ================================================================
+    # Category Prevalence Plot
+    # ================================================================
+    
+    .plotCategoryPrevalence = function(image, ggtheme, theme, ...) {
+      
+      state <- image$state
+      if (is.null(state) || !isTRUE(state$valid))
+        return(FALSE)
+      
+      categories <- as.character(state$categories)
+      percentages <- as.numeric(state$percentages)
+      if (length(categories) == 0L ||
+          length(categories) != length(percentages) ||
+          any(!is.finite(percentages)))
+        return(FALSE)
+      
+      plot_data <- data.frame(
+        Category = factor(categories, levels = rev(categories)),
+        Percentage = percentages,
+        Label = sprintf("%.1f%%", percentages),
+        stringsAsFactors = FALSE
+      )
+      palette <- grDevices::hcl.colors(
+        max(3, length(categories)), palette = "Dark 3"
+      )[seq_along(categories)]
+      names(palette) <- categories
+      
+      plot <- ggplot2::ggplot(
+        plot_data,
+        ggplot2::aes(x = Category, y = Percentage, fill = Category)
+      ) +
+        ggplot2::geom_col(width = 0.72, show.legend = FALSE) +
+        ggplot2::geom_text(
+          ggplot2::aes(label = Label), hjust = -0.15, size = 3.5
+        ) +
+        ggplot2::scale_fill_manual(values = palette) +
+        ggplot2::scale_y_continuous(
+          limits = c(0, 100),
+          breaks = seq(0, 100, by = 25),
+          labels = function(x) paste0(x, "%"),
+          expand = ggplot2::expansion(mult = c(0, 0.12))
+        ) +
+        ggplot2::coord_flip(clip = "off") +
+        ggplot2::labs(
+          x = NULL, y = "Documents with Adjusted Matches (%)"
+        ) +
+        ggtheme +
+        ggplot2::theme(
+          legend.position = "none",
+          panel.grid.major.y = ggplot2::element_blank(),
+          plot.margin = ggplot2::margin(5.5, 40, 5.5, 5.5)
+        )
+      
+      print(plot)
       TRUE
     },
     

@@ -154,4 +154,25 @@ options:
       title: Negation Impact Plot 
       type: Bool
       default: false      
+
+    - name: cooccurrence
+      title: Category Co-occurrence
+      type: Bool
+      default: false
+      description: |
+        Counts documents in which both categories have
+        at least one adjusted match.
+
+    - name: cooccurrencePlot
+      title: Category Co-occurrence Heatmap
+      type: Bool
+      default: false
+
+    - name: prevalencePlot
+      title: Category Prevalence Plot
+      type: Bool
+      default: false
+      description: |
+        Displays the percentage of documents with
+        at least one adjusted match in each category.
 ...

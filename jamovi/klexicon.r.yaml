@@ -215,6 +215,41 @@ items:
           title: Treatment
           type: text
 
+    # ============================================================
+    # Category Co-occurrence
+    # ============================================================
+
+    - name: cooccurrence
+      title: Category Co-occurrence
+      type: Table
+      rows: 0
+      visible: (cooccurrence)
+      clearWith:
+        - textVar
+        - lexicon
+        - normalizeKorean
+        - negationMode
+        - negationWindow
+        - negationCues
+        - cooccurrence
+
+      columns:
+
+        - name: category1
+          title: Category 1
+          type: text
+
+        - name: category2
+          title: Category 2
+          type: text
+
+        - name: docCount
+          title: Docs with Both
+          type: integer
+
+        - name: docPerc
+          title: '% of Docs'
+          type: number
 
     # ============================================================
     # 6. Status
@@ -269,6 +304,48 @@ items:
         - negationMode
         - negationWindow
         - negationCues
+
+
+    # ============================================================
+    # Category Co-occurrence Heatmap
+    # ============================================================
+
+    - name: cooccurrencePlot
+      title: Category Co-occurrence Heatmap
+      type: Image
+      width: 650
+      height: 550
+      renderFun: .plotCategoryCooccurrence
+      visible: (cooccurrencePlot)
+      clearWith:
+        - textVar
+        - lexicon
+        - normalizeKorean
+        - negationMode
+        - negationWindow
+        - negationCues
+        - cooccurrencePlot
+
+
+    # ============================================================
+    # Category Prevalence Plot
+    # ============================================================
+
+    - name: prevalencePlot
+      title: Category Prevalence Plot
+      type: Image
+      width: 650
+      height: 450
+      renderFun: .plotCategoryPrevalence
+      visible: (prevalencePlot)
+      clearWith:
+        - textVar
+        - lexicon
+        - normalizeKorean
+        - negationMode
+        - negationWindow
+        - negationCues
+        - prevalencePlot
 
 
     # ============================================================

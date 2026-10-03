@@ -19,7 +19,10 @@ klexiconOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
             documentDetails = FALSE,
             negationEvidence = FALSE,
             categoryPlot = FALSE,
-            negationImpactPlot = FALSE, ...) {
+            negationImpactPlot = FALSE,
+            cooccurrence = FALSE,
+            cooccurrencePlot = FALSE,
+            prevalencePlot = FALSE, ...) {
 
             super$initialize(
                 package="snowText",
@@ -95,6 +98,18 @@ klexiconOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                 "negationImpactPlot",
                 negationImpactPlot,
                 default=FALSE)
+            private$..cooccurrence <- jmvcore::OptionBool$new(
+                "cooccurrence",
+                cooccurrence,
+                default=FALSE)
+            private$..cooccurrencePlot <- jmvcore::OptionBool$new(
+                "cooccurrencePlot",
+                cooccurrencePlot,
+                default=FALSE)
+            private$..prevalencePlot <- jmvcore::OptionBool$new(
+                "prevalencePlot",
+                prevalencePlot,
+                default=FALSE)
 
             self$.addOption(private$..textVar)
             self$.addOption(private$..lexicon)
@@ -108,6 +123,9 @@ klexiconOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
             self$.addOption(private$..detectedWords)
             self$.addOption(private$..categoryPlot)
             self$.addOption(private$..negationImpactPlot)
+            self$.addOption(private$..cooccurrence)
+            self$.addOption(private$..cooccurrencePlot)
+            self$.addOption(private$..prevalencePlot)
         }),
     active = list(
         textVar = function() private$..textVar$value,
@@ -121,7 +139,10 @@ klexiconOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
         saveResults = function() private$..saveResults$value,
         detectedWords = function() private$..detectedWords$value,
         categoryPlot = function() private$..categoryPlot$value,
-        negationImpactPlot = function() private$..negationImpactPlot$value),
+        negationImpactPlot = function() private$..negationImpactPlot$value,
+        cooccurrence = function() private$..cooccurrence$value,
+        cooccurrencePlot = function() private$..cooccurrencePlot$value,
+        prevalencePlot = function() private$..prevalencePlot$value),
     private = list(
         ..textVar = NA,
         ..lexicon = NA,
@@ -134,7 +155,10 @@ klexiconOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
         ..saveResults = NA,
         ..detectedWords = NA,
         ..categoryPlot = NA,
-        ..negationImpactPlot = NA)
+        ..negationImpactPlot = NA,
+        ..cooccurrence = NA,
+        ..cooccurrencePlot = NA,
+        ..prevalencePlot = NA)
 )
 
 klexiconResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
@@ -147,9 +171,12 @@ klexiconResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
         catSummary = function() private$.items[["catSummary"]],
         documentDetails = function() private$.items[["documentDetails"]],
         negationEvidence = function() private$.items[["negationEvidence"]],
+        cooccurrence = function() private$.items[["cooccurrence"]],
         statusNote = function() private$.items[["statusNote"]],
         categoryPlot = function() private$.items[["categoryPlot"]],
         negationImpactPlot = function() private$.items[["negationImpactPlot"]],
+        cooccurrencePlot = function() private$.items[["cooccurrencePlot"]],
+        prevalencePlot = function() private$.items[["prevalencePlot"]],
         saveResults = function() private$.items[["saveResults"]],
         detectedWords = function() private$.items[["detectedWords"]]),
     private = list(),
@@ -335,6 +362,37 @@ klexiconResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                         `name`="action", 
                         `title`="Treatment", 
                         `type`="text"))))
+            self$add(jmvcore::Table$new(
+                options=options,
+                name="cooccurrence",
+                title="Category Co-occurrence",
+                rows=0,
+                visible="(cooccurrence)",
+                clearWith=list(
+                    "textVar",
+                    "lexicon",
+                    "normalizeKorean",
+                    "negationMode",
+                    "negationWindow",
+                    "negationCues",
+                    "cooccurrence"),
+                columns=list(
+                    list(
+                        `name`="category1", 
+                        `title`="Category 1", 
+                        `type`="text"),
+                    list(
+                        `name`="category2", 
+                        `title`="Category 2", 
+                        `type`="text"),
+                    list(
+                        `name`="docCount", 
+                        `title`="Docs with Both", 
+                        `type`="integer"),
+                    list(
+                        `name`="docPerc", 
+                        `title`="% of Docs", 
+                        `type`="number"))))
             self$add(jmvcore::Preformatted$new(
                 options=options,
                 name="statusNote",
@@ -377,6 +435,38 @@ klexiconResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                     "negationMode",
                     "negationWindow",
                     "negationCues")))
+            self$add(jmvcore::Image$new(
+                options=options,
+                name="cooccurrencePlot",
+                title="Category Co-occurrence Heatmap",
+                width=650,
+                height=550,
+                renderFun=".plotCategoryCooccurrence",
+                visible="(cooccurrencePlot)",
+                clearWith=list(
+                    "textVar",
+                    "lexicon",
+                    "normalizeKorean",
+                    "negationMode",
+                    "negationWindow",
+                    "negationCues",
+                    "cooccurrencePlot")))
+            self$add(jmvcore::Image$new(
+                options=options,
+                name="prevalencePlot",
+                title="Category Prevalence Plot",
+                width=650,
+                height=450,
+                renderFun=".plotCategoryPrevalence",
+                visible="(prevalencePlot)",
+                clearWith=list(
+                    "textVar",
+                    "lexicon",
+                    "normalizeKorean",
+                    "negationMode",
+                    "negationWindow",
+                    "negationCues",
+                    "prevalencePlot")))
             self$add(jmvcore::Output$new(
                 options=options,
                 name="saveResults",
@@ -446,6 +536,11 @@ klexiconBase <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
 #' @param negationEvidence .
 #' @param categoryPlot .
 #' @param negationImpactPlot .
+#' @param cooccurrence Counts documents in which both categories have at least
+#'   one adjusted match.
+#' @param cooccurrencePlot .
+#' @param prevalencePlot Displays the percentage of documents with at least
+#'   one adjusted match in each category.
 #' @return A results object containing:
 #' \tabular{llllll}{
 #'   \code{results$instructions} \tab \tab \tab \tab \tab a html \cr
@@ -454,9 +549,12 @@ klexiconBase <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
 #'   \code{results$catSummary} \tab \tab \tab \tab \tab a table \cr
 #'   \code{results$documentDetails} \tab \tab \tab \tab \tab a table \cr
 #'   \code{results$negationEvidence} \tab \tab \tab \tab \tab a table \cr
+#'   \code{results$cooccurrence} \tab \tab \tab \tab \tab a table \cr
 #'   \code{results$statusNote} \tab \tab \tab \tab \tab a preformatted \cr
 #'   \code{results$categoryPlot} \tab \tab \tab \tab \tab an image \cr
 #'   \code{results$negationImpactPlot} \tab \tab \tab \tab \tab an image \cr
+#'   \code{results$cooccurrencePlot} \tab \tab \tab \tab \tab an image \cr
+#'   \code{results$prevalencePlot} \tab \tab \tab \tab \tab an image \cr
 #'   \code{results$saveResults} \tab \tab \tab \tab \tab an output \cr
 #'   \code{results$detectedWords} \tab \tab \tab \tab \tab an output \cr
 #' }
@@ -483,7 +581,10 @@ klexicon <- function(
     documentDetails = FALSE,
     negationEvidence = FALSE,
     categoryPlot = FALSE,
-    negationImpactPlot = FALSE) {
+    negationImpactPlot = FALSE,
+    cooccurrence = FALSE,
+    cooccurrencePlot = FALSE,
+    prevalencePlot = FALSE) {
 
     if ( ! requireNamespace("jmvcore", quietly=TRUE))
         stop("klexicon requires jmvcore to be installed (restart may be required)")
@@ -505,7 +606,10 @@ klexicon <- function(
         documentDetails = documentDetails,
         negationEvidence = negationEvidence,
         categoryPlot = categoryPlot,
-        negationImpactPlot = negationImpactPlot)
+        negationImpactPlot = negationImpactPlot,
+        cooccurrence = cooccurrence,
+        cooccurrencePlot = cooccurrencePlot,
+        prevalencePlot = prevalencePlot)
 
     analysis <- klexiconClass$new(
         options = options,

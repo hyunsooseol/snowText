@@ -143,9 +143,11 @@ children:
             children:
               - type: CheckBox
                 name: documentDetails
-    
               - type: CheckBox
                 name: negationEvidence
+              - type: CheckBox
+                name: cooccurrence
+
 
       - type: LayoutBox
         stretchFactor: 1
@@ -160,9 +162,13 @@ children:
             children:
               - type: CheckBox
                 name: categoryPlot
-    
               - type: CheckBox
                 name: negationImpactPlot
+              - type: CheckBox
+                name: cooccurrencePlot
+              - type: CheckBox
+                name: prevalencePlot
+
             
   # ============================================================
   # Save

@@ -19,7 +19,10 @@ klexicon(
   documentDetails = FALSE,
   negationEvidence = FALSE,
   categoryPlot = FALSE,
-  negationImpactPlot = FALSE
+  negationImpactPlot = FALSE,
+  cooccurrence = FALSE,
+  cooccurrencePlot = FALSE,
+  prevalencePlot = FALSE
 )
 }
 \arguments{
@@ -48,6 +51,14 @@ trailing * indicates prefix matching.}
 \item{categoryPlot}{.}
 
 \item{negationImpactPlot}{.}
+
+\item{cooccurrence}{Counts documents in which both categories have at least
+one adjusted match.}
+
+\item{cooccurrencePlot}{.}
+
+\item{prevalencePlot}{Displays the percentage of documents with at least
+one adjusted match in each category.}
 }
 \value{
 A results object containing:
@@ -58,9 +69,12 @@ A results object containing:
   \code{results$catSummary} \tab \tab \tab \tab \tab a table \cr
   \code{results$documentDetails} \tab \tab \tab \tab \tab a table \cr
   \code{results$negationEvidence} \tab \tab \tab \tab \tab a table \cr
+  \code{results$cooccurrence} \tab \tab \tab \tab \tab a table \cr
   \code{results$statusNote} \tab \tab \tab \tab \tab a preformatted \cr
   \code{results$categoryPlot} \tab \tab \tab \tab \tab an image \cr
   \code{results$negationImpactPlot} \tab \tab \tab \tab \tab an image \cr
+  \code{results$cooccurrencePlot} \tab \tab \tab \tab \tab an image \cr
+  \code{results$prevalencePlot} \tab \tab \tab \tab \tab an image \cr
   \code{results$saveResults} \tab \tab \tab \tab \tab an output \cr
   \code{results$detectedWords} \tab \tab \tab \tab \tab an output \cr
 }
